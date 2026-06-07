@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <title>PhoneShop</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- Remix Icon (modern icon set) -->
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
+
+  <!-- Swiper CSS (для слайдера баннеров) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
+  <!-- Custom styles -->
+  <link rel="stylesheet" href="./css/styles.css" />
+
+  <!-- Tailwind config -->
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { inter: ['Inter', 'sans-serif'] },
+          colors: {
+            primary: { DEFAULT: '#6366f1', dark: '#4f46e5' },
+            accent:  { DEFAULT: '#f59e0b', dark: '#d97706' },
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="font-inter bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 overflow-x-hidden">
+
+  <!-- ══════════════════════════════════════════
+       SPLASH SCREEN
+  ══════════════════════════════════════════ -->
+  <div id="splash" class="splash-screen">
+    <div class="splash-inner">
+      <div class="splash-logo">
+        <i class="ri-smartphone-line"></i>
+      </div>
+      <h1 class="splash-title">PhoneShop</h1>
+      <p class="splash-sub">Лучшие смартфоны</p>
+      <div class="splash-loader">
+        <div class="splash-progress"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       MAIN APP
+  ══════════════════════════════════════════ -->
+  <div id="app" class="app-wrapper opacity-0">
+
+    <!-- ── HEADER ── -->
+    <header class="app-header" id="appHeader">
+      <div class="header-inner">
+        <div class="header-logo">
+          <i class="ri-smartphone-line"></i>
+          <span>PhoneShop</span>
+        </div>
+        <div class="header-actions">
+          <button class="icon-btn" id="searchBtn" aria-label="Поиск">
+            <i class="ri-search-line"></i>
+          </button>
+          <button class="icon-btn cart-btn" id="cartBtn" aria-label="Корзина">
+            <i class="ri-shopping-cart-2-line"></i>
+            <span class="cart-badge hidden" id="cartBadge">0</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- ── SEARCH BAR (collapsed by default) ── -->
+    <div class="search-bar-wrap" id="searchBarWrap">
+      <div class="search-bar">
+        <i class="ri-search-line search-icon"></i>
+        <input type="text" id="searchInput" placeholder="iPhone 15, Samsung S24..." />
+        <button id="searchClear" class="search-clear hidden">
+          <i class="ri-close-line"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- ── TAB NAV ── -->
+    <nav class="tab-nav" id="tabNav">
+      <button class="tab-item active" data-tab="buy">
+        <i class="ri-store-2-line"></i>
+        <span>Купить</span>
+        <div class="tab-indicator"></div>
+      </button>
+      <button class="tab-item" data-tab="sell">
+        <i class="ri-exchange-dollar-line"></i>
+        <span>Продать</span>
+        <div class="tab-indicator"></div>
+      </button>
+      <button class="tab-item" data-tab="orders">
+        <i class="ri-file-list-3-line"></i>
+        <span>Заказы</span>
+        <div class="tab-indicator"></div>
+      </button>
+    </nav>
+
+    <!-- ══════════════════════════════════════════
+         TAB: BUY
+    ══════════════════════════════════════════ -->
+    <section class="tab-content active" id="tab-buy">
+
+      <!-- Banner Swiper -->
+      <div class="banner-swiper-wrap">
+        <div class="swiper bannerSwiper">
+          <div class="swiper-wrapper">
+            <div class="swiper-slide">
+              <div class="banner-card banner-purple">
+                <div class="banner-text">
+                  <span class="banner-tag">Хит продаж</span>
+                  <h2>iPhone 15 Pro<br/>Max</h2>
+                  <p>от 89 990 ₽</p>
+                  <button class="banner-btn">Смотреть →</button>
+                </div>
+                <div class="banner-img">
+                  <i class="ri-smartphone-line"></i>
+                </div>
+              </div>
+            </div>
+            <div class="swiper-slide">
+              <div class="banner-card banner-blue">
+                <div class="banner-text">
+                  <span class="banner-tag">Новинка</span>
+                  <h2>Samsung<br/>Galaxy S24</h2>
+                  <p>от 74 990 ₽</p>
+                  <button class="banner-btn">Смотреть →</button>
+                </div>
+                <div class="banner-img">
+                  <i class="ri-smartphone-line"></i>
+                </div>
+              </div>
+            </div>
+            <div class="swiper-slide">
+              <div class="banner-card banner-green">
+                <div class="banner-text">
+                  <span class="banner-tag">Скидка 20%</span>
+                  <h2>Xiaomi<br/>14 Ultra</h2>
+                  <p>от 59 990 ₽</p>
+                  <button class="banner-btn">Смотреть →</button>
+                </div>
+                <div class="banner-img">
+                  <i class="ri-smartphone-line"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="swiper-pagination"></div>
+        </div>
+      </div>
+
+      <!-- Brand Filter Chips -->
+      <div class="section-header">
+        <h3 class="section-title">Каталог</h3>
+      </div>
+      <div class="brand-filter" id="brandFilter">
+        <button class="chip active" data-brand="all">Все</button>
+        <button class="chip" data-brand="apple">Apple</button>
+        <button class="chip" data-brand="samsung">Samsung</button>
+        <button class="chip" data-brand="xiaomi">Xiaomi</button>
+        <button class="chip" data-brand="google">Google</button>
+        <button class="chip" data-brand="oneplus">OnePlus</button>
+      </div>
+
+      <!-- Sort Bar -->
+      <div class="sort-bar">
+        <span class="sort-count" id="sortCount">24 товара</span>
+        <select class="sort-select" id="sortSelect">
+          <option value="popular">По популярности</option>
+          <option value="price-asc">Цена ↑</option>
+          <option value="price-desc">Цена ↓</option>
+          <option value="new">Новинки</option>
+        </select>
+      </div>
+
+      <!-- Products Grid -->
+      <div class="products-grid" id="productsGrid">
+        <!-- JS renders cards here; skeleton shown initially -->
+        <div class="skeleton-card"><div class="sk-img"></div><div class="sk-line w-3/4"></div><div class="sk-line w-1/2"></div><div class="sk-line w-1/3"></div></div>
+        <div class="skeleton-card"><div class="sk-img"></div><div class="sk-line w-3/4"></div><div class="sk-line w-1/2"></div><div class="sk-line w-1/3"></div></div>
+        <div class="skeleton-card"><div class="sk-img"></div><div class="sk-line w-3/4"></div><div class="sk-line w-1/2"></div><div class="sk-line w-1/3"></div></div>
+        <div class="skeleton-card"><div class="sk-img"></div><div class="sk-line w-3/4"></div><div class="sk-line w-1/2"></div><div class="sk-line w-1/3"></div></div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════
+         TAB: SELL
+    ══════════════════════════════════════════ -->
+    <section class="tab-content" id="tab-sell">
+      <div class="sell-hero">
+        <div class="sell-hero-icon"><i class="ri-exchange-dollar-line"></i></div>
+        <h2>Сдайте телефон</h2>
+        <p>Оценим за 30 секунд и предложим лучшую цену</p>
+      </div>
+
+      <form class="sell-form" id="sellForm">
+
+        <!-- Step 1: Brand -->
+        <div class="form-step active" id="step1">
+          <div class="step-label"><span class="step-num">1</span> Выберите бренд</div>
+          <div class="brand-grid" id="sellBrandGrid">
+            <div class="brand-tile" data-brand="Apple"><i class="ri-apple-fill"></i><span>Apple</span></div>
+            <div class="brand-tile" data-brand="Samsung"><i class="ri-global-line"></i><span>Samsung</span></div>
+            <div class="brand-tile" data-brand="Xiaomi"><i class="ri-global-line"></i><span>Xiaomi</span></div>
+            <div class="brand-tile" data-brand="Google"><i class="ri-google-fill"></i><span>Google</span></div>
+            <div class="brand-tile" data-brand="OnePlus"><i class="ri-global-line"></i><span>OnePlus</span></div>
+            <div class="brand-tile" data-brand="Другой"><i class="ri-more-line"></i><span>Другой</span></div>
+          </div>
+        </div>
+
+        <!-- Step 2: Model -->
+        <div class="form-step" id="step2">
+          <div class="step-label"><span class="step-num">2</span> Модель</div>
+          <div class="custom-select-wrap">
+            <select class="custom-select" id="sellModel">
+              <option value="">-- Выберите модель --</option>
+            </select>
+            <i class="ri-arrow-down-s-line select-arrow"></i>
+          </div>
+        </div>
+
+        <!-- Step 3: Storage -->
+        <div class="form-step" id="step3">
+          <div class="step-label"><span class="step-num">3</span> Объём памяти</div>
+          <div class="storage-chips" id="storageChips">
+            <button type="button" class="storage-chip" data-gb="64">64 ГБ</button>
+            <button type="button" class="storage-chip" data-gb="128">128 ГБ</button>
+            <button type="button" class="storage-chip" data-gb="256">256 ГБ</button>
+            <button type="button" class="storage-chip" data-gb="512">512 ГБ</button>
+            <button type="button" class="storage-chip" data-gb="1024">1 ТБ</button>
+          </div>
+        </div>
+
+        <!-- Step 4: Condition Slider -->
+        <div class="form-step" id="step4">
+          <div class="step-label"><span class="step-num">4</span> Состояние</div>
+          <div class="condition-wrap">
+            <div class="condition-labels">
+              <span>Плохое</span>
+              <span>Хорошее</span>
+              <span>Отличное</span>
+            </div>
+            <div class="slider-track-wrap">
+              <input type="range" id="conditionSlider" min="1" max="5" value="3" step="1" class="condition-slider" />
+              <div class="slider-fill" id="sliderFill"></div>
+            </div>
+            <div class="condition-badges">
+              <span class="cond-badge" data-val="1">D</span>
+              <span class="cond-badge" data-val="2">C</span>
+              <span class="cond-badge active" data-val="3">B</span>
+              <span class="cond-badge" data-val="4">A</span>
+              <span class="cond-badge" data-val="5">S</span>
+            </div>
+            <div class="condition-desc" id="conditionDesc">
+              <i class="ri-checkbox-circle-line"></i>
+              <span>Хорошее состояние — небольшие царапины, полностью рабочий</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 5: Contact -->
+        <div class="form-step" id="step5">
+          <div class="step-label"><span class="step-num">5</span> Ваши контакты</div>
+          <div class="input-group">
+            <label>Имя</label>
+            <div class="input-wrap">
+              <i class="ri-user-line input-icon"></i>
+              <input type="text" id="sellName" placeholder="Как вас зовут?" />
+            </div>
+          </div>
+          <div class="input-group">
+            <label>Телефон</label>
+            <div class="input-wrap">
+              <i class="ri-phone-line input-icon"></i>
+              <input type="tel" id="sellPhone" placeholder="+7 (999) 000-00-00" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Price Estimator Block -->
+        <div class="price-estimator" id="priceEstimator">
+          <div class="price-est-header">
+            <i class="ri-money-dollar-circle-line"></i>
+            <span>Предварительная оценка</span>
+          </div>
+          <div class="price-est-value" id="estPrice">— ₽</div>
+          <p class="price-est-note">Точная цена — после проверки устройства</p>
+        </div>
+
+        <button type="submit" class="submit-btn" id="sellSubmitBtn" disabled>
+          <i class="ri-send-plane-2-line"></i>
+          Отправить заявку
+        </button>
+      </form>
+    </section>
+
+    <!-- ══════════════════════════════════════════
+         TAB: ORDERS
+    ══════════════════════════════════════════ -->
+    <section class="tab-content" id="tab-orders">
+      <div class="orders-wrap">
+        <div class="orders-empty" id="ordersEmpty">
+          <div class="empty-icon"><i class="ri-file-list-3-line"></i></div>
+          <h3>Заказов пока нет</h3>
+          <p>Ваши покупки и заявки на скупку появятся здесь</p>
+          <button class="outline-btn" onclick="switchTab('buy')">
+            <i class="ri-store-2-line"></i> Перейти в каталог
+          </button>
+        </div>
+        <div class="orders-list hidden" id="ordersList"></div>
+      </div>
+    </section>
+
+    <!-- bottom safe area spacer -->
+    <div class="bottom-spacer"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       CART DRAWER
+  ══════════════════════════════════════════ -->
+  <div class="drawer-overlay hidden" id="drawerOverlay"></div>
+  <div class="cart-drawer" id="cartDrawer">
+    <div class="drawer-handle"></div>
+    <div class="drawer-header">
+      <h3><i class="ri-shopping-cart-2-line"></i> Корзина</h3>
+      <button class="icon-btn" id="closeCart"><i class="ri-close-line"></i></button>
+    </div>
+    <div class="drawer-body" id="cartItems">
+      <div class="cart-empty" id="cartEmpty">
+        <i class="ri-shopping-cart-2-line"></i>
+        <p>Корзина пуста</p>
+      </div>
+    </div>
+    <div class="drawer-footer" id="cartFooter">
+      <div class="cart-total">
+        <span>Итого:</span>
+        <strong id="cartTotal">0 ₽</strong>
+      </div>
+      <button class="submit-btn" id="checkoutBtn">
+        <i class="ri-shield-check-line"></i>
+        Оформить заказ
+      </button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       PRODUCT DETAIL MODAL
+  ══════════════════════════════════════════ -->
+  <div class="modal-overlay hidden" id="productModalOverlay">
+    <div class="product-modal" id="productModal">
+      <button class="modal-close" id="modalClose"><i class="ri-close-line"></i></button>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       TOAST NOTIFICATION
+  ══════════════════════════════════════════ -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- SUCCESS ANIMATION -->
+  <div class="success-overlay hidden" id="successOverlay">
+    <div class="success-card">
+      <div class="success-icon"><i class="ri-checkbox-circle-fill"></i></div>
+      <h3 id="successTitle">Заявка отправлена!</h3>
+      <p id="successDesc">Мы свяжемся с вами в ближайшее время</p>
+      <button class="submit-btn" id="successClose">Отлично!</button>
+    </div>
+  </div>
+
+  <!-- Telegram WebApp SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <!-- Swiper JS -->
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <!-- App Logic -->
+  <script src="./js/app.js"></script>
+</body>
+</html>
