@@ -1,6 +1,5 @@
 /* ═══════════════════════════════════════════════════════
-   PhoneShop — Telegram Bot
-   Запуск бота и отправка ссылки на Mini App
+   Malika_A22 — Telegram Bot (Закупка телефонов)
    ═══════════════════════════════════════════════════════ */
 
 'use strict';
@@ -27,16 +26,17 @@ bot.onText(/\/start/, async (msg) => {
 
   await bot.sendMessage(chatId,
     `👋 Привет, ${firstName}!\n\n` +
-    `Добро пожаловать в <b>PhoneShop</b> — магазин лучших смартфонов.\n\n` +
-    `📱 <b>Купи</b> новый телефон по лучшей цене\n` +
-    `💸 <b>Продай</b> старый телефон — быстро и выгодно\n\n` +
-    `Нажми кнопку ниже, чтобы открыть магазин 👇`,
+    `Добро пожаловать в <b>Malika_A22</b> — сервис закупки б/у телефонов.\n\n` +
+    `📱 <b>Сдайте</b> свой телефон и получите деньги сразу\n` +
+    `💰 <b>Честная оценка</b> — Apple, Samsung, Xiaomi и другие\n` +
+    `⚡ <b>Быстро и выгодно</b> — оплата в день обращения\n\n` +
+    `Нажми кнопку ниже, чтобы оформить заявку 👇`,
     {
       parse_mode: 'HTML',
       reply_markup: {
         inline_keyboard: [[
           {
-            text: '🛍️ Открыть магазин',
+            text: '📲 Сдать телефон',
             web_app: { url: WEBAPP_URL },
           }
         ]]
@@ -45,34 +45,17 @@ bot.onText(/\/start/, async (msg) => {
   );
 });
 
-/* ─── /catalog ─── */
-bot.onText(/\/catalog/, async (msg) => {
-  await bot.sendMessage(msg.chat.id,
-    '📦 Каталог смартфонов — открой Mini App:',
-    {
-      parse_mode: 'HTML',
-      reply_markup: {
-        keyboard: [[
-          { text: '🛍️ Открыть PhoneShop', web_app: { url: WEBAPP_URL } }
-        ]],
-        resize_keyboard: true,
-        one_time_keyboard: false,
-      }
-    }
-  );
-});
-
-/* ─── /sell ─── */
+/* ─── /sell — оформить заявку ─── */
 bot.onText(/\/sell/, async (msg) => {
   await bot.sendMessage(msg.chat.id,
-    '💸 Хочешь продать телефон? Открой магазин и перейди на вкладку <b>"Продать"</b>:',
+    '📲 Хотите сдать телефон? Откройте форму заявки:',
     {
       parse_mode: 'HTML',
       reply_markup: {
         inline_keyboard: [[
           {
-            text: '💸 Сдать телефон',
-            web_app: { url: `${WEBAPP_URL}#sell` },
+            text: '📲 Оформить заявку',
+            web_app: { url: WEBAPP_URL },
           }
         ]]
       }
@@ -80,20 +63,33 @@ bot.onText(/\/sell/, async (msg) => {
   );
 });
 
+/* ─── /brands — какие бренды принимаем ─── */
+bot.onText(/\/brands/, async (msg) => {
+  await bot.sendMessage(msg.chat.id,
+    `📦 <b>Принимаем следующие бренды:</b>\n\n` +
+    `🍎 <b>Apple</b> — iPhone 11, 12, 13, 14, 15, 16 (все серии)\n` +
+    `📱 <b>Samsung</b> — Galaxy S, A, Z Fold/Flip\n` +
+    `🔶 <b>Xiaomi / Redmi / POCO</b> — актуальные модели\n` +
+    `📲 <b>Tecno / Infinix / Realme</b> — популярные модели\n\n` +
+    `Также рассматриваем другие бренды — уточняйте у менеджера.`,
+    { parse_mode: 'HTML' }
+  );
+});
+
 /* ─── /help ─── */
 bot.onText(/\/help/, async (msg) => {
   await bot.sendMessage(msg.chat.id,
-    `ℹ️ <b>Команды PhoneShop:</b>\n\n` +
+    `ℹ️ <b>Команды Malika_A22:</b>\n\n` +
     `/start — главное меню\n` +
-    `/catalog — каталог телефонов\n` +
-    `/sell — продать телефон\n` +
+    `/sell — оформить заявку на закупку\n` +
+    `/brands — какие телефоны принимаем\n` +
     `/help — справка\n\n` +
     `По всем вопросам: @manager`,
     { parse_mode: 'HTML' }
   );
 });
 
-/* ─── web_app_data — получение данных от Mini App ─── */
+/* ─── web_app_data — данные от Mini App ─── */
 bot.on('message', async (msg) => {
   if (!msg.web_app_data) return;
 
@@ -102,7 +98,7 @@ bot.on('message', async (msg) => {
     console.log('[WebApp data]', data);
 
     await bot.sendMessage(msg.chat.id,
-      `✅ Данные получены от Mini App!\nТип: ${data.type}`,
+      `✅ Данные заявки получены!\nТип: ${data.type}`,
       { parse_mode: 'HTML' }
     );
   } catch (err) {

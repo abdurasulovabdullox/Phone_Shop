@@ -4,22 +4,22 @@
 
 /* ── CSS Custom Properties ── */
 :root {
-  --primary:       #6366f1;
-  --primary-dark:  #4f46e5;
-  --primary-light: #a5b4fc;
+  --primary:       #00C853;
+  --primary-dark:  #009624;
+  --primary-light: #66dd94;
   --accent:        #f59e0b;
   --success:       #10b981;
   --danger:        #ef4444;
 
-  --bg:            #f8fafc;
+  --bg:            #f5f5f5;
   --bg-card:       #ffffff;
-  --bg-card2:      #f1f5f9;
-  --bg-nav:        #ffffff;
-  --bg-input:      #f1f5f9;
+  --bg-card2:      #f0f0f0;
+  --bg-nav:        #111111;
+  --bg-input:      #f0f0f0;
 
-  --text:          #0f172a;
-  --text-2:        #475569;
-  --text-3:        #94a3b8;
+  --text:          #111111;
+  --text-2:        #444444;
+  --text-3:        #888888;
 
   --border:        #e2e8f0;
   --shadow-sm:     0 1px 3px rgba(0,0,0,.07), 0 1px 2px rgba(0,0,0,.05);
@@ -42,16 +42,16 @@
 
 /* Dark theme */
 [data-theme="dark"], .dark {
-  --bg:            #0f172a;
-  --bg-card:       #1e293b;
-  --bg-card2:      #1e293b;
-  --bg-nav:        #1e293b;
-  --bg-input:      #0f172a;
-  --text:          #f1f5f9;
-  --text-2:        #94a3b8;
-  --text-3:        #475569;
-  --border:        #334155;
-  --shadow-md:     0 4px 16px rgba(0,0,0,.3);
+  --bg:            #0a0a0a;
+  --bg-card:       #1a1a1a;
+  --bg-card2:      #222222;
+  --bg-nav:        #0d0d0d;
+  --bg-input:      #0a0a0a;
+  --text:          #f5f5f5;
+  --text-2:        #aaaaaa;
+  --text-3:        #666666;
+  --border:        #2a2a2a;
+  --shadow-md:     0 4px 16px rgba(0,0,0,.5);
 }
 
 /* ── Reset & Base ── */
@@ -75,7 +75,7 @@ body {
 .splash-screen {
   position: fixed;
   inset: 0;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+  background: linear-gradient(145deg, #0d0d0d 0%, #0a1f0d 50%, #003d18 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -97,37 +97,41 @@ body {
 }
 
 .splash-logo {
-  width: 80px;
-  height: 80px;
-  background: rgba(255,255,255,0.2);
+  width: 88px;
+  height: 88px;
+  background: rgba(0,200,83,0.12);
   backdrop-filter: blur(20px);
-  border-radius: 22px;
+  border-radius: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 40px;
-  color: white;
+  color: #00C853;
   animation: logoFloat 1.5s ease infinite alternate;
-  border: 1px solid rgba(255,255,255,0.3);
+  border: 2px solid rgba(0,200,83,0.4);
+  overflow: hidden;
+  box-shadow: 0 0 32px rgba(0,200,83,0.25);
 }
 
 .splash-title {
   font-size: 28px;
-  font-weight: 800;
-  color: white;
+  font-weight: 900;
+  color: #ffffff;
   letter-spacing: -0.5px;
 }
 
 .splash-sub {
-  font-size: 14px;
-  color: rgba(255,255,255,0.7);
-  font-weight: 500;
+  font-size: 13px;
+  color: #00C853;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 .splash-loader {
   width: 120px;
   height: 3px;
-  background: rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.1);
   border-radius: 99px;
   margin-top: 16px;
   overflow: hidden;
@@ -135,7 +139,7 @@ body {
 
 .splash-progress {
   height: 100%;
-  background: white;
+  background: linear-gradient(90deg, #00C853, #66dd94);
   border-radius: 99px;
   animation: loadProgress 1.8s ease forwards;
 }
@@ -169,8 +173,8 @@ body {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: var(--bg-nav);
-  border-bottom: 1px solid var(--border);
+  background: #111111;
+  border-bottom: 1px solid #222222;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   padding-top: var(--safe-top);
@@ -178,7 +182,7 @@ body {
 }
 
 .app-header.scrolled {
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
 }
 
 .header-inner {
@@ -192,14 +196,14 @@ body {
 .header-logo {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   font-size: 18px;
   font-weight: 800;
-  color: var(--primary);
+  color: #ffffff;
   letter-spacing: -0.3px;
 }
 
-.header-logo i { font-size: 22px; }
+.header-logo i { font-size: 22px; color: #00C853; }
 
 .header-actions { display: flex; gap: 4px; }
 
@@ -207,20 +211,20 @@ body {
   width: 40px;
   height: 40px;
   border: none;
-  background: var(--bg-card2);
+  background: rgba(255,255,255,0.08);
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 18px;
-  color: var(--text);
+  color: #ffffff;
   cursor: pointer;
   transition: all var(--transition);
   position: relative;
 }
 
 .icon-btn:active { transform: scale(0.92); }
-.icon-btn:hover { background: var(--border); }
+.icon-btn:hover { background: rgba(255,255,255,0.15); }
 
 .cart-btn { color: var(--primary); }
 
@@ -305,8 +309,8 @@ body {
    ═══════════════════════════════════════════════════════ */
 .tab-nav {
   display: flex;
-  background: var(--bg-nav);
-  border-bottom: 1px solid var(--border);
+  background: #ffffff;
+  border-bottom: 2px solid var(--border);
   position: sticky;
   top: var(--header-h);
   z-index: 90;
@@ -394,9 +398,9 @@ body {
   backdrop-filter: blur(0px);
 }
 
-.banner-purple { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
-.banner-blue   { background: linear-gradient(135deg, #3b82f6, #6366f1); }
-.banner-green  { background: linear-gradient(135deg, #10b981, #3b82f6); }
+.banner-purple { background: linear-gradient(135deg, #111111, #1a2a1a); }
+.banner-blue   { background: linear-gradient(135deg, #00C853, #009624); }
+.banner-green  { background: linear-gradient(135deg, #009624, #006618); }
 
 .banner-text { position: relative; z-index: 1; }
 
@@ -509,7 +513,7 @@ body {
   background: var(--primary);
   border-color: var(--primary);
   color: white;
-  box-shadow: 0 4px 12px rgba(99,102,241,0.35);
+  box-shadow: 0 4px 12px rgba(0,200,83,0.35);
 }
 
 /* ── Sort Bar ── */
@@ -719,27 +723,42 @@ body {
    SELL TAB
    ═══════════════════════════════════════════════════════ */
 .sell-hero {
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
-  padding: 32px 24px 28px;
+  background: linear-gradient(135deg, #111111 0%, #1a2a1a 60%, #004d20 100%);
+  padding: 36px 24px 32px;
   text-align: center;
   color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.sell-hero::after {
+  content: '';
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 180px;
+  height: 180px;
+  background: radial-gradient(circle, rgba(0,200,83,0.2) 0%, transparent 70%);
+  pointer-events: none;
 }
 
 .sell-hero-icon {
   width: 64px;
   height: 64px;
-  background: rgba(255,255,255,0.2);
+  background: rgba(0,200,83,0.2);
   border-radius: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 32px;
   margin: 0 auto 16px;
-  border: 1px solid rgba(255,255,255,0.3);
+  border: 2px solid rgba(0,200,83,0.5);
+  color: #00C853;
+  box-shadow: 0 0 24px rgba(0,200,83,0.3);
 }
 
-.sell-hero h2 { font-size: 24px; font-weight: 800; margin-bottom: 6px; letter-spacing: -0.3px; }
-.sell-hero p  { font-size: 14px; opacity: 0.8; font-weight: 500; }
+.sell-hero h2 { font-size: 26px; font-weight: 900; margin-bottom: 6px; letter-spacing: -0.3px; }
+.sell-hero p  { font-size: 14px; color: rgba(255,255,255,0.7); font-weight: 500; }
 
 .sell-form {
   padding: 16px;
@@ -753,6 +772,7 @@ body {
   background: var(--bg-card);
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
+  border-left: 3px solid #00C853;
   padding: 16px;
   display: none;
   animation: stepIn 0.3s ease both;
@@ -780,13 +800,14 @@ body {
 .step-num {
   width: 22px;
   height: 22px;
-  background: var(--primary);
-  color: white;
+  background: #00C853;
+  color: #111111;
   border-radius: 99px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-size: 12px;
+  font-weight: 800;
   flex-shrink: 0;
 }
 
@@ -819,7 +840,7 @@ body {
 
 .brand-tile.selected {
   border-color: var(--primary);
-  background: rgba(99,102,241,0.08);
+  background: rgba(0,200,83,0.08);
   color: var(--primary);
 }
 
@@ -858,6 +879,27 @@ body {
   pointer-events: none;
 }
 
+/* Sub-step block (внутри form-step) */
+.substep-block {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--border);
+}
+
+.step-sublabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+}
+
+.step-sublabel i { font-size: 14px; color: #00C853; }
+
 /* Storage Chips */
 .storage-chips { display: flex; flex-wrap: wrap; gap: 8px; }
 
@@ -878,7 +920,7 @@ body {
 
 .storage-chip.selected {
   border-color: var(--primary);
-  background: rgba(99,102,241,0.08);
+  background: rgba(0,200,83,0.08);
   color: var(--primary);
 }
 
@@ -918,7 +960,7 @@ body {
   border-radius: 99px;
   background: var(--primary);
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(99,102,241,0.4);
+  box-shadow: 0 2px 8px rgba(0,200,83,0.4);
   border: 3px solid white;
   transition: transform var(--spring);
 }
@@ -963,20 +1005,20 @@ body {
   border-color: var(--primary);
   color: white;
   transform: scale(1.15);
-  box-shadow: 0 4px 12px rgba(99,102,241,0.4);
+  box-shadow: 0 4px 12px rgba(0,200,83,0.4);
 }
 
 .condition-desc {
   display: flex;
   align-items: flex-start;
   gap: 8px;
-  background: rgba(99,102,241,0.07);
+  background: rgba(0,200,83,0.08);
   border-radius: var(--radius-sm);
   padding: 10px 12px;
   font-size: 13px;
-  color: var(--primary);
-  font-weight: 500;
-  border: 1px solid rgba(99,102,241,0.15);
+  color: #009624;
+  font-weight: 600;
+  border: 1.5px solid rgba(0,200,83,0.25);
 }
 
 .condition-desc i { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
@@ -1025,8 +1067,8 @@ body {
 
 /* Price Estimator */
 .price-estimator {
-  background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(139,92,246,0.08));
-  border: 2px solid rgba(99,102,241,0.2);
+  background: linear-gradient(135deg, rgba(0,200,83,0.07), rgba(0,150,36,0.1));
+  border: 2px solid rgba(0,200,83,0.3);
   border-radius: var(--radius-md);
   padding: 20px;
   text-align: center;
@@ -1068,16 +1110,66 @@ body {
   font-weight: 500;
 }
 
+.price-market-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.price-market-row.hidden { display: none; }
+.price-market-label {
+  font-size: 12px;
+  color: var(--text-3);
+  font-weight: 500;
+}
+.price-market-val {
+  font-size: 14px;
+  color: var(--text-3);
+  font-weight: 600;
+  text-decoration: line-through;
+}
+
+/* Reject card */
+.reject-card {
+  background: linear-gradient(135deg, rgba(239,68,68,0.07), rgba(239,68,68,0.12));
+  border: 2px solid rgba(239,68,68,0.4);
+  border-radius: var(--radius-md);
+  padding: 24px 20px;
+  text-align: center;
+  margin-bottom: 16px;
+  animation: fadeUp 0.35s ease both;
+}
+.reject-card.hidden { display: none; }
+.reject-icon {
+  font-size: 42px;
+  color: #ef4444;
+  margin-bottom: 10px;
+  line-height: 1;
+}
+.reject-card h3 {
+  font-size: 17px;
+  font-weight: 800;
+  color: #ef4444;
+  margin-bottom: 8px;
+}
+.reject-card p {
+  font-size: 14px;
+  color: var(--text-2);
+  line-height: 1.55;
+  margin-bottom: 16px;
+}
+
 /* Submit Button */
 .submit-btn {
   width: 100%;
   padding: 15px 20px;
-  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  background: linear-gradient(135deg, #00C853, #009624);
   color: white;
   border: none;
   border-radius: var(--radius-md);
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 800;
   font-family: inherit;
   cursor: pointer;
   display: flex;
@@ -1085,8 +1177,10 @@ body {
   justify-content: center;
   gap: 8px;
   transition: all var(--transition);
-  box-shadow: 0 4px 16px rgba(99,102,241,0.35);
+  box-shadow: 0 4px 20px rgba(0,200,83,0.4);
   letter-spacing: -0.2px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .submit-btn:disabled {
@@ -1097,7 +1191,7 @@ body {
 
 .submit-btn:not(:disabled):active {
   transform: scale(0.97);
-  box-shadow: 0 2px 8px rgba(99,102,241,0.3);
+  box-shadow: 0 2px 8px rgba(0,200,83,0.3);
 }
 
 .submit-btn i { font-size: 18px; }
@@ -1106,8 +1200,8 @@ body {
 .outline-btn {
   padding: 12px 24px;
   background: transparent;
-  color: var(--primary);
-  border: 2px solid var(--primary);
+  color: #00C853;
+  border: 2px solid #00C853;
   border-radius: var(--radius-md);
   font-size: 15px;
   font-weight: 700;
@@ -1120,7 +1214,7 @@ body {
   transition: all var(--transition);
 }
 
-.outline-btn:active { transform: scale(0.96); background: rgba(99,102,241,0.07); }
+.outline-btn:active { transform: scale(0.96); background: rgba(0,200,83,0.07); }
 
 /* ═══════════════════════════════════════════════════════
    ORDERS TAB
@@ -1177,9 +1271,9 @@ body {
   border-radius: 99px;
 }
 
-.status-new      { background: rgba(99,102,241,0.1);  color: var(--primary); }
-.status-process  { background: rgba(245,158,11,0.1);  color: var(--accent); }
-.status-done     { background: rgba(16,185,129,0.1);  color: var(--success); }
+.status-new      { background: rgba(0,200,83,0.12); color: #009624; font-weight: 700; }
+.status-process  { background: rgba(245,158,11,0.12); color: #b45309; font-weight: 700; }
+.status-done     { background: rgba(16,185,129,0.12); color: #065f46; font-weight: 700; }
 
 .order-items { font-size: 13px; color: var(--text-2); margin-bottom: 8px; line-height: 1.5; }
 .order-total { font-size: 16px; font-weight: 800; color: var(--text); }
@@ -1502,7 +1596,7 @@ body {
 
 .success-icon {
   font-size: 64px;
-  color: var(--success);
+  color: #00C853;
   margin-bottom: 16px;
   animation: checkBounce 0.6s 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
@@ -1536,7 +1630,7 @@ body {
   border-radius: 50%;
   transform: scale(0);
   animation: rippleAnim 0.5s linear;
-  background: rgba(99,102,241,0.15);
+  background: rgba(0,200,83,0.15);
   pointer-events: none;
 }
 
@@ -1549,14 +1643,14 @@ body {
    ═══════════════════════════════════════════════════════ */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg:         #0f172a;
-    --bg-card:    #1e293b;
-    --bg-card2:   #1e293b;
-    --bg-nav:     #1e293b;
-    --bg-input:   #0f172a;
-    --text:       #f1f5f9;
-    --text-2:     #94a3b8;
-    --text-3:     #475569;
-    --border:     #334155;
+    --bg:         #0a0a0a;
+    --bg-card:    #1a1a1a;
+    --bg-card2:   #222222;
+    --bg-nav:     #0d0d0d;
+    --bg-input:   #0a0a0a;
+    --text:       #f5f5f5;
+    --text-2:     #aaaaaa;
+    --text-3:     #666666;
+    --border:     #2a2a2a;
   }
 }

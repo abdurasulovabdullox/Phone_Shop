@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════
-   PhoneShop TMA — Main App Logic
+   Malika_A22 TMA — Закупка телефонов (Trade-in)
    ═══════════════════════════════════════════════════════ */
 
 'use strict';
@@ -21,65 +21,405 @@ function applyTelegramTheme() {
 
 /* ─── State ─── */
 const state = {
-  cart:    JSON.parse(localStorage.getItem('cart') || '[]'),
-  orders:  JSON.parse(localStorage.getItem('orders') || '[]'),
+  orders: JSON.parse(localStorage.getItem('orders') || '[]'),
   sell: {
     brand:   null,
     model:   null,
     storage: null,
     cond:    3,
+    batt:    null,
+    repair:  null,
+    kit:     null,
     name:    '',
     phone:   '',
   },
-  filter:  'all',
-  sort:    'popular',
-  search:  '',
 };
 
-/* ─── Phone catalogue data ─── */
-const PHONES = [
-  { id: 1,  brand: 'apple',   name: 'iPhone 15 Pro Max', storage: '256 ГБ', color: 'Titanium', price: 129990, oldPrice: 149990, badge: 'хит',  icon: '📱', specs: { cpu: 'A17 Pro', ram: '8 ГБ', cam: '48 Мп', bat: '4422 мАч' }, desc: 'Профессиональная камерная система. Titanium корпус. USB-C. Action Button.' },
-  { id: 2,  brand: 'apple',   name: 'iPhone 15 Pro',     storage: '128 ГБ', color: 'Black',    price: 99990,  oldPrice: null,   badge: null,  icon: '📱', specs: { cpu: 'A17 Pro', ram: '8 ГБ', cam: '48 Мп', bat: '3274 мАч' }, desc: 'Мощный чип A17 Pro в компактном корпусе из титана.' },
-  { id: 3,  brand: 'apple',   name: 'iPhone 15',         storage: '128 ГБ', color: 'Pink',     price: 79990,  oldPrice: 89990,  badge: 'sale', icon: '📱', specs: { cpu: 'A16',     ram: '6 ГБ', cam: '48 Мп', bat: '3349 мАч' }, desc: 'Dynamic Island, USB-C, 48 Мп камера в доступном флагмане.' },
-  { id: 4,  brand: 'samsung', name: 'Galaxy S24 Ultra',  storage: '256 ГБ', color: 'Black',    price: 119990, oldPrice: 129990, badge: 'хит',  icon: '📱', specs: { cpu: 'Snapdragon 8 Gen 3', ram: '12 ГБ', cam: '200 Мп', bat: '5000 мАч' }, desc: 'S Pen, 200 Мп камера и встроенный Galaxy AI.' },
-  { id: 5,  brand: 'samsung', name: 'Galaxy S24+',       storage: '256 ГБ', color: 'Violet',   price: 89990,  oldPrice: null,   badge: 'new',  icon: '📱', specs: { cpu: 'Snapdragon 8 Gen 3', ram: '12 ГБ', cam: '50 Мп', bat: '4900 мАч' }, desc: 'Большой 6.7" экран Amoled с яркостью 2600 нит.' },
-  { id: 6,  brand: 'samsung', name: 'Galaxy S24',        storage: '128 ГБ', color: 'Cobalt',   price: 74990,  oldPrice: 79990,  badge: null,  icon: '📱', specs: { cpu: 'Exynos 2400', ram: '8 ГБ', cam: '50 Мп', bat: '4000 мАч' }, desc: 'Компактный Galaxy S с Galaxy AI на борту.' },
-  { id: 7,  brand: 'xiaomi',  name: 'Xiaomi 14 Ultra',   storage: '512 ГБ', color: 'White',    price: 89990,  oldPrice: 99990,  badge: 'sale', icon: '📱', specs: { cpu: 'Snapdragon 8 Gen 3', ram: '16 ГБ', cam: '50 Мп', bat: '5300 мАч' }, desc: 'Камерная система Leica с переменной диафрагмой.' },
-  { id: 8,  brand: 'xiaomi',  name: 'Xiaomi 14',         storage: '256 ГБ', color: 'Black',    price: 64990,  oldPrice: null,   badge: 'new',  icon: '📱', specs: { cpu: 'Snapdragon 8 Gen 3', ram: '12 ГБ', cam: '50 Мп', bat: '4610 мАч' }, desc: 'Компактный флагман с камерой Leica и MIUI 15.' },
-  { id: 9,  brand: 'google',  name: 'Pixel 8 Pro',       storage: '256 ГБ', color: 'Bay',      price: 84990,  oldPrice: 94990,  badge: 'хит',  icon: '📱', specs: { cpu: 'Tensor G3', ram: '12 ГБ', cam: '50 Мп', bat: '5050 мАч' }, desc: 'Лучший AI-смартфон с Tensor G3. Чистый Android.' },
-  { id: 10, brand: 'google',  name: 'Pixel 8',           storage: '128 ГБ', color: 'Hazel',    price: 59990,  oldPrice: null,   badge: null,  icon: '📱', specs: { cpu: 'Tensor G3', ram: '8 ГБ', cam: '50 Мп', bat: '4575 мАч' }, desc: 'Умная камера с ластиком Magic Eraser и Call Screen.' },
-  { id: 11, brand: 'oneplus', name: 'OnePlus 12',        storage: '256 ГБ', color: 'Silky',    price: 74990,  oldPrice: 82990,  badge: 'sale', icon: '📱', specs: { cpu: 'Snapdragon 8 Gen 3', ram: '12 ГБ', cam: '50 Мп', bat: '5400 мАч' }, desc: 'Hasselblad камера и 100Вт зарядка. Быстрее всех.' },
-  { id: 12, brand: 'oneplus', name: 'OnePlus 12R',       storage: '128 ГБ', color: 'Iron',     price: 44990,  oldPrice: 49990,  badge: null,  icon: '📱', specs: { cpu: 'Snapdragon 8 Gen 2', ram: '8 ГБ', cam: '50 Мп', bat: '5500 мАч' }, desc: 'Доступный флагман с 80Вт зарядкой и OxygenOS.' },
-];
-
-/* ─── Models per brand (for sell form) ─── */
+/* ════════════════════════════════════════════════════
+   МОДЕЛИ ПО БРЕНДАМ
+   ════════════════════════════════════════════════════ */
 const SELL_MODELS = {
-  Apple:   ['iPhone 15 Pro Max', 'iPhone 15 Pro', 'iPhone 15 Plus', 'iPhone 15', 'iPhone 14 Pro Max', 'iPhone 14 Pro', 'iPhone 14', 'iPhone 13', 'iPhone 12', 'Старше'],
-  Samsung: ['Galaxy S24 Ultra', 'Galaxy S24+', 'Galaxy S24', 'Galaxy S23 Ultra', 'Galaxy S23', 'Galaxy A54', 'Galaxy A34', 'Другая'],
-  Xiaomi:  ['Xiaomi 14 Ultra', 'Xiaomi 14', 'Xiaomi 13T Pro', 'Xiaomi 13', 'Redmi Note 13 Pro', 'Redmi Note 12', 'Другая'],
-  Google:  ['Pixel 8 Pro', 'Pixel 8', 'Pixel 7 Pro', 'Pixel 7', 'Pixel 6a', 'Другой'],
-  OnePlus: ['OnePlus 12', 'OnePlus 12R', 'OnePlus 11', 'OnePlus 10 Pro', 'Другой'],
-  Другой:  ['Указать в заявке'],
+  Apple: [
+    'iPhone 16 Pro Max', 'iPhone 16 Pro', 'iPhone 16 Plus', 'iPhone 16',
+    'iPhone 15 Pro Max', 'iPhone 15 Pro', 'iPhone 15 Plus', 'iPhone 15',
+    'iPhone 14 Pro Max', 'iPhone 14 Pro', 'iPhone 14 Plus', 'iPhone 14',
+    'iPhone 13 Pro Max', 'iPhone 13 Pro', 'iPhone 13 mini', 'iPhone 13',
+    'iPhone SE (2022)', 'iPhone SE (2020)',
+    'iPhone 12 Pro Max', 'iPhone 12 Pro', 'iPhone 12 mini', 'iPhone 12',
+    'iPhone 11 Pro Max', 'iPhone 11 Pro', 'iPhone 11',
+    'Старше iPhone 11',
+  ],
+  Samsung: [
+    'Galaxy S25 Ultra', 'Galaxy S25+', 'Galaxy S25',
+    'Galaxy S24 Ultra', 'Galaxy S24+', 'Galaxy S24',
+    'Galaxy S23 Ultra', 'Galaxy S23+', 'Galaxy S23',
+    'Galaxy S22 Ultra', 'Galaxy S22+', 'Galaxy S22',
+    'Galaxy S21 Ultra', 'Galaxy S21+', 'Galaxy S21',
+    'Galaxy S20 Ultra', 'Galaxy S20+', 'Galaxy S20',
+    'Galaxy Note 20 Ultra', 'Galaxy Note 20',
+    'Galaxy Note 10+', 'Galaxy Note 10',
+    'Galaxy A73', 'Galaxy A72', 'Galaxy A55', 'Galaxy A54', 'Galaxy A53', 'Galaxy A52',
+    'Galaxy A35', 'Galaxy A34', 'Galaxy A33', 'Galaxy A32',
+    'Galaxy A25', 'Galaxy A24', 'Galaxy A23', 'Galaxy A22',
+    'Galaxy A15', 'Galaxy A15 5G', 'Galaxy A14', 'Galaxy A14 5G', 'Galaxy A13',
+    'Galaxy A05s', 'Galaxy A05', 'Galaxy A04s', 'Galaxy A04',
+    'Galaxy M34 5G', 'Galaxy M33 5G', 'Galaxy M23', 'Galaxy M22', 'Galaxy M13', 'Galaxy M12',
+    'Galaxy Z Fold 6', 'Galaxy Z Fold 5', 'Galaxy Z Fold 4', 'Galaxy Z Fold 3',
+    'Galaxy Z Flip 6', 'Galaxy Z Flip 5', 'Galaxy Z Flip 4', 'Galaxy Z Flip 3',
+    'Другая модель',
+  ],
+  Xiaomi: [
+    'Xiaomi 15 Ultra', 'Xiaomi 15 Pro', 'Xiaomi 15',
+    'Xiaomi 14 Ultra', 'Xiaomi 14 Pro', 'Xiaomi 14',
+    'Xiaomi 13 Ultra', 'Xiaomi 13 Pro', 'Xiaomi 13',
+    'Xiaomi 12 Pro', 'Xiaomi 12',
+    'Xiaomi Mi 11 Ultra', 'Xiaomi Mi 11 Pro', 'Xiaomi Mi 11',
+    'Xiaomi Mi 10 Pro', 'Xiaomi Mi 10',
+    'Redmi Note 14 Pro+', 'Redmi Note 14 Pro', 'Redmi Note 14',
+    'Redmi Note 13 Pro+', 'Redmi Note 13 Pro', 'Redmi Note 13',
+    'Redmi Note 12 Pro+', 'Redmi Note 12 Pro', 'Redmi Note 12', 'Redmi Note 12S',
+    'Redmi Note 11 Pro+', 'Redmi Note 11 Pro', 'Redmi Note 11S', 'Redmi Note 11',
+    'Redmi Note 10 Pro', 'Redmi Note 10S', 'Redmi Note 10',
+    'Redmi Note 9 Pro', 'Redmi Note 9S', 'Redmi Note 9',
+    'Redmi 13C', 'Redmi 12C', 'Redmi 12', 'Redmi 10C', 'Redmi 10', 'Redmi 9T', 'Redmi 9',
+    'Redmi A3', 'Redmi A2', 'Redmi A1',
+    'POCO X6 Pro', 'POCO X6', 'POCO X5 Pro', 'POCO X5',
+    'POCO X4 Pro 5G', 'POCO X4 GT', 'POCO X3 Pro', 'POCO X3 NFC',
+    'POCO M6 Pro', 'POCO M5s', 'POCO M5', 'POCO M4 Pro', 'POCO M4', 'POCO M3 Pro', 'POCO M3',
+    'POCO F5 Pro', 'POCO F5', 'POCO F4 GT', 'POCO F4', 'POCO F3',
+    'POCO C65', 'POCO C55', 'POCO C40',
+    'Другая модель',
+  ],
+  Tecno: [
+    'Tecno Camon 30 Pro+', 'Tecno Camon 30 Pro', 'Tecno Camon 30',
+    'Tecno Camon 20 Premier', 'Tecno Camon 20 Pro', 'Tecno Camon 20',
+    'Tecno Camon 19 Pro', 'Tecno Camon 19',
+    'Tecno Camon 18 Premier', 'Tecno Camon 18 Pro', 'Tecno Camon 18',
+    'Tecno Spark 20 Pro+', 'Tecno Spark 20 Pro', 'Tecno Spark 20',
+    'Tecno Spark 10 Pro', 'Tecno Spark 10',
+    'Tecno Spark 9 Pro', 'Tecno Spark 9',
+    'Tecno Spark 8 Pro', 'Tecno Spark 8',
+    'Tecno Pova 6 Pro', 'Tecno Pova 6', 'Tecno Pova 5 Pro', 'Tecno Pova 5',
+    'Tecno Pova 4 Pro', 'Tecno Pova 4', 'Tecno Pova 3',
+    'Tecno Phantom V Fold2', 'Tecno Phantom V Fold', 'Tecno Phantom V Flip2', 'Tecno Phantom V Flip',
+    'Tecno Pop 8', 'Tecno Pop 7', 'Tecno Pop 6',
+    'Infinix Zero 40 5G', 'Infinix Zero 30 5G', 'Infinix Zero 30', 'Infinix Zero 20',
+    'Infinix Note 40 Pro+ 5G', 'Infinix Note 40 Pro', 'Infinix Note 40',
+    'Infinix Note 30 Pro', 'Infinix Note 30 VIP', 'Infinix Note 30',
+    'Infinix Note 12 Pro', 'Infinix Note 12 VIP', 'Infinix Note 12',
+    'Infinix Note 11 Pro', 'Infinix Note 11',
+    'Infinix Hot 40 Pro', 'Infinix Hot 40', 'Infinix Hot 30i', 'Infinix Hot 30',
+    'Infinix Hot 20 Pro', 'Infinix Hot 20', 'Infinix Hot 20i',
+    'Infinix Hot 12 Pro', 'Infinix Hot 12',
+    'Infinix Smart 8 Pro', 'Infinix Smart 8', 'Infinix Smart 7',
+    'Realme GT 6', 'Realme GT 5 Pro', 'Realme GT 5',
+    'Realme GT Neo 6', 'Realme GT Neo 5', 'Realme GT Neo 3T', 'Realme GT Neo 3',
+    'Realme GT 2 Pro', 'Realme GT 2', 'Realme GT Master',
+    'Realme 12 Pro+', 'Realme 12 Pro', 'Realme 12',
+    'Realme 11 Pro+', 'Realme 11 Pro', 'Realme 11',
+    'Realme 10 Pro+', 'Realme 10 Pro', 'Realme 10',
+    'Realme 9 Pro+', 'Realme 9 Pro', 'Realme 9i', 'Realme 9',
+    'Realme 8 Pro', 'Realme 8',
+    'Realme Narzo 70 Pro', 'Realme Narzo 60 Pro', 'Realme Narzo 50 Pro', 'Realme Narzo 50',
+    'Realme C67', 'Realme C65', 'Realme C63', 'Realme C61',
+    'Realme C55', 'Realme C53', 'Realme C51',
+    'Realme C35', 'Realme C33', 'Realme C31',
+    'Другая модель',
+  ],
+  Другой: ['Указать в комментарии'],
 };
 
-/* ─── Base buy prices per brand (rough estimate) ─── */
+/* ════════════════════════════════════════════════════
+   РЫНОЧНЫЕ ЦЕНЫ В USD (вторичный рынок, хорошее состояние)
+   Наше предложение = цена × 0.83 × множители
+   ════════════════════════════════════════════════════ */
+const MODEL_PRICES = {
+  /* ─── Apple ─── */
+  'iPhone 16 Pro Max':  { 256: 990,  512: 1090, 1024: 1190 },
+  'iPhone 16 Pro':      { 128: 890,  256: 990,  512:  1090 },
+  'iPhone 16 Plus':     { 128: 740,  256:  820              },
+  'iPhone 16':          { 128: 670,  256:  740              },
+  'iPhone 15 Pro Max':  { 256: 790,  512:  880, 1024:  980  },
+  'iPhone 15 Pro':      { 128: 680,  256:  760, 512:   860  },
+  'iPhone 15 Plus':     { 128: 590,  256:  660              },
+  'iPhone 15':          { 128: 520,  256:  580              },
+  'iPhone 14 Pro Max':  { 128: 620,  256:  690, 512:   790, 1024: 890 },
+  'iPhone 14 Pro':      { 128: 550,  256:  610, 512:   710  },
+  'iPhone 14 Plus':     { 128: 430,  256:  490              },
+  'iPhone 14':          { 128: 380,  256:  430              },
+  'iPhone 13 Pro Max':  { 128: 480,  256:  530, 512:   610, 1024: 710 },
+  'iPhone 13 Pro':      { 128: 420,  256:  470, 512:   550  },
+  'iPhone 13 mini':     { 128: 290,  256:  340              },
+  'iPhone 13':          { 128: 340,  256:  380, 512:   450  },
+  'iPhone SE (2022)':   { 64:  200,  128:  230, 256:   280  },
+  'iPhone SE (2020)':   { 64:  150,  128:  175, 256:   210  },
+  'iPhone 12 Pro Max':  { 128: 350,  256:  390, 512:   450  },
+  'iPhone 12 Pro':      { 128: 290,  256:  330, 512:   390  },
+  'iPhone 12 mini':     { 64:  200,  128:  240, 256:   290  },
+  'iPhone 12':          { 64:  230,  128:  270, 256:   320  },
+  'iPhone 11 Pro Max':  { 64:  200,  256:  240, 512:   290  },
+  'iPhone 11 Pro':      { 64:  170,  256:  210, 512:   260  },
+  'iPhone 11':          { 64:  150,  128:  175, 256:   210  },
+
+  /* ─── Samsung ─── */
+  'Galaxy S25 Ultra':   { 256: 840,  512:  940, 1024: 1040  },
+  'Galaxy S25+':        { 256: 670,  512:  760              },
+  'Galaxy S25':         { 128: 570,  256:  630              },
+  'Galaxy S24 Ultra':   { 256: 740,  512:  830, 1024:  930  },
+  'Galaxy S24+':        { 256: 580,  512:  670              },
+  'Galaxy S24':         { 128: 430,  256:  480              },
+  'Galaxy S23 Ultra':   { 256: 590,  512:  670              },
+  'Galaxy S23+':        { 256: 430,  512:  490              },
+  'Galaxy S23':         { 128: 320,  256:  370              },
+  'Galaxy S22 Ultra':   { 128: 440,  256:  490, 512:   550  },
+  'Galaxy S22+':        { 128: 280,  256:  330              },
+  'Galaxy S22':         { 128: 220,  256:  260              },
+  'Galaxy S21 Ultra':   { 128: 340,  256:  390, 512:   450  },
+  'Galaxy S21+':        { 128: 240,  256:  280              },
+  'Galaxy S21':         { 128: 190,  256:  230              },
+  'Galaxy S20 Ultra':   { 128: 245,  256:  285              },
+  'Galaxy S20+':        { 128: 185,  256:  220              },
+  'Galaxy S20':         { 128: 145,  256:  175              },
+  'Galaxy Note 20 Ultra': { 256: 310, 512:  370             },
+  'Galaxy Note 20':     { 256: 240                          },
+  'Galaxy Note 10+':    { 256: 195,  512:  235              },
+  'Galaxy Note 10':     { 256: 155                          },
+  'Galaxy A73':         { 256: 200                          },
+  'Galaxy A72':         { 128: 170,  256:  195              },
+  'Galaxy A55':         { 128: 235,  256:  265              },
+  'Galaxy A54':         { 128: 195,  256:  230              },
+  'Galaxy A53':         { 128: 160,  256:  190              },
+  'Galaxy A52':         { 128: 140,  256:  170              },
+  'Galaxy A35':         { 128: 165,  256:  195              },
+  'Galaxy A34':         { 128: 145,  256:  175              },
+  'Galaxy A33':         { 128: 130,  256:  160              },
+  'Galaxy A32':         { 128: 115,  256:  140              },
+  'Galaxy A25':         { 128: 125,  256:  150              },
+  'Galaxy A24':         { 128: 110,  256:  135              },
+  'Galaxy A23':         { 128:  95,  256:  120              },
+  'Galaxy A22':         { 128:  85,  256:  105              },
+  'Galaxy A15':         { 128:  95,  256:  120              },
+  'Galaxy A15 5G':      { 128: 100,  256:  125              },
+  'Galaxy A14':         { 64:   70,  128:   95              },
+  'Galaxy A14 5G':      { 64:   75,  128:  100              },
+  'Galaxy A13':         { 64:   60,  128:   80              },
+  'Galaxy A05s':        { 64:   65,  128:   80              },
+  'Galaxy A05':         { 64:   55,  128:   70              },
+  'Galaxy A04s':        { 64:   50,  128:   65              },
+  'Galaxy A04':         { 64:   45,  128:   60              },
+  'Galaxy M34 5G':      { 128: 110,  256:  135              },
+  'Galaxy M33 5G':      { 128:  95,  256:  115              },
+  'Galaxy M23':         { 128:  80,  256:  100              },
+  'Galaxy M22':         { 128:  75,  256:   95              },
+  'Galaxy M13':         { 64:   60,  128:   75              },
+  'Galaxy M12':         { 64:   50,  128:   65              },
+  'Galaxy Z Fold 6':    { 256: 980,  512: 1080              },
+  'Galaxy Z Fold 5':    { 256: 740,  512:  840              },
+  'Galaxy Z Fold 4':    { 256: 580,  512:  670              },
+  'Galaxy Z Fold 3':    { 256: 420,  512:  480              },
+  'Galaxy Z Flip 6':    { 256: 590                          },
+  'Galaxy Z Flip 5':    { 256: 420,  512:  480              },
+  'Galaxy Z Flip 4':    { 128: 290,  256:  340              },
+  'Galaxy Z Flip 3':    { 128: 220,  256:  260              },
+
+  /* ─── Xiaomi / Redmi / POCO ─── */
+  'Xiaomi 15 Ultra':    { 256: 820,  512:  900              },
+  'Xiaomi 15 Pro':      { 256: 620,  512:  700              },
+  'Xiaomi 15':          { 256: 470,  512:  540              },
+  'Xiaomi 14 Ultra':    { 512: 650                          },
+  'Xiaomi 14 Pro':      { 256: 480,  512:  550              },
+  'Xiaomi 14':          { 256: 380,  512:  450              },
+  'Xiaomi 13 Ultra':    { 512: 490                          },
+  'Xiaomi 13 Pro':      { 256: 370                          },
+  'Xiaomi 13':          { 256: 290,  512:  350              },
+  'Xiaomi 12 Pro':      { 256: 250                          },
+  'Xiaomi 12':          { 128: 190,  256:  230              },
+  'Xiaomi Mi 11 Ultra': { 256: 300                          },
+  'Xiaomi Mi 11 Pro':   { 256: 260                          },
+  'Xiaomi Mi 11':       { 128: 190,  256:  220              },
+  'Xiaomi Mi 10 Pro':   { 256: 240                          },
+  'Xiaomi Mi 10':       { 128: 175,  256:  205              },
+  'Redmi Note 14 Pro+': { 256: 270,  512:  310              },
+  'Redmi Note 14 Pro':  { 256: 215,  512:  250              },
+  'Redmi Note 14':      { 128: 155,  256:  185              },
+  'Redmi Note 13 Pro+': { 256: 240,  512:  280              },
+  'Redmi Note 13 Pro':  { 256: 190,  512:  230              },
+  'Redmi Note 13':      { 128: 130,  256:  160              },
+  'Redmi Note 12 Pro+': { 256: 175                          },
+  'Redmi Note 12 Pro':  { 256: 160                          },
+  'Redmi Note 12':      { 128: 115,  256:  140              },
+  'Redmi Note 12S':     { 128: 120,  256:  145              },
+  'Redmi Note 11 Pro+': { 128: 115,  256:  140              },
+  'Redmi Note 11 Pro':  { 128: 110,  256:  135              },
+  'Redmi Note 11S':     { 128: 100,  256:  120              },
+  'Redmi Note 11':      { 128:  95,  256:  115              },
+  'Redmi Note 10 Pro':  { 64:  115,  128:  135              },
+  'Redmi Note 10S':     { 64:   90,  128:  110              },
+  'Redmi Note 10':      { 64:   85,  128:  100              },
+  'Redmi Note 9 Pro':   { 64:   80,  128:   95              },
+  'Redmi Note 9S':      { 64:   75,  128:   90              },
+  'Redmi Note 9':       { 64:   65,  128:   80              },
+  'Redmi 13C':          { 128:  90                          },
+  'Redmi 12C':          { 64:   65,  128:   80              },
+  'Redmi 12':           { 128: 110,  256:  130              },
+  'Redmi 10C':          { 64:   60,  128:   75              },
+  'Redmi 10':           { 64:   60,  128:   75              },
+  'Redmi 9T':           { 64:   55,  128:   70              },
+  'Redmi 9':            { 64:   50,  128:   65              },
+  'Redmi A3':           { 64:   50,  128:   65              },
+  'Redmi A2':           { 32:   40,  64:    55              },
+  'Redmi A1':           { 32:   35,  64:    50              },
+  'POCO X6 Pro':        { 256: 250,  512:  290              },
+  'POCO X6':            { 256: 200                          },
+  'POCO X5 Pro':        { 256: 200                          },
+  'POCO X5':            { 128: 150,  256:  175              },
+  'POCO X4 Pro 5G':     { 128: 160,  256:  195              },
+  'POCO X4 GT':         { 128: 150,  256:  180              },
+  'POCO X3 Pro':        { 128: 120,  256:  145              },
+  'POCO X3 NFC':        { 64:   90,  128:  110              },
+  'POCO M6 Pro':        { 256: 160                          },
+  'POCO M5s':           { 128: 105,  256:  130              },
+  'POCO M5':            { 128: 100,  256:  125              },
+  'POCO M4 Pro':        { 128: 120,  256:  145              },
+  'POCO M4':            { 64:   80,  128:  100              },
+  'POCO M3 Pro':        { 64:   75,  128:   95              },
+  'POCO M3':            { 64:   65,  128:   80              },
+  'POCO F5 Pro':        { 256: 320                          },
+  'POCO F5':            { 256: 240                          },
+  'POCO F4 GT':         { 128: 240,  256:  280              },
+  'POCO F4':            { 128: 195,  256:  230              },
+  'POCO F3':            { 128: 170,  256:  205              },
+  'POCO C65':           { 128:  85,  256:  100              },
+  'POCO C55':           { 128:  75                          },
+  'POCO C40':           { 64:   55,  128:   70              },
+
+  /* ─── Tecno / Infinix / Realme ─── */
+  'Tecno Camon 30 Pro+':      { 256: 200 },
+  'Tecno Camon 30 Pro':       { 256: 175 },
+  'Tecno Camon 30':           { 128: 125 },
+  'Tecno Camon 20 Premier':   { 256: 170 },
+  'Tecno Camon 20 Pro':       { 256: 150 },
+  'Tecno Camon 20':           { 128: 110 },
+  'Tecno Camon 19 Pro':       { 128: 120 },
+  'Tecno Camon 19':           { 128: 100 },
+  'Tecno Camon 18 Premier':   { 128: 130 },
+  'Tecno Camon 18 Pro':       { 128: 115 },
+  'Tecno Camon 18':           { 128:  95 },
+  'Tecno Spark 20 Pro+':      { 128: 125 },
+  'Tecno Spark 20 Pro':       { 128: 115 },
+  'Tecno Spark 20':           { 64:  80, 128:  95 },
+  'Tecno Spark 10 Pro':       { 128: 100 },
+  'Tecno Spark 10':           { 64:  70, 128:  85 },
+  'Tecno Spark 9 Pro':        { 128:  85 },
+  'Tecno Spark 9':            { 64:  60, 128:  75 },
+  'Tecno Spark 8 Pro':        { 128:  75 },
+  'Tecno Spark 8':            { 64:  50, 128:  65 },
+  'Tecno Pova 6 Pro':         { 256: 155 },
+  'Tecno Pova 6':             { 128: 115 },
+  'Tecno Pova 5 Pro':         { 128: 100 },
+  'Tecno Pova 5':             { 128:  85 },
+  'Tecno Pova 4 Pro':         { 128:  95 },
+  'Tecno Pova 4':             { 128:  80 },
+  'Tecno Pova 3':             { 128:  70 },
+  'Tecno Phantom V Fold2':    { 256: 490 },
+  'Tecno Phantom V Fold':     { 256: 450 },
+  'Tecno Phantom V Flip2':    { 256: 310 },
+  'Tecno Phantom V Flip':     { 256: 280 },
+  'Tecno Pop 8':              { 64:  45 },
+  'Tecno Pop 7':              { 64:  40 },
+  'Tecno Pop 6':              { 64:  35 },
+  'Infinix Zero 40 5G':       { 256: 240 },
+  'Infinix Zero 30 5G':       { 256: 225 },
+  'Infinix Zero 30':          { 256: 210 },
+  'Infinix Zero 20':          { 256: 160 },
+  'Infinix Note 40 Pro+ 5G':  { 256: 215 },
+  'Infinix Note 40 Pro':      { 256: 175 },
+  'Infinix Note 40':          { 128: 135 },
+  'Infinix Note 30 Pro':      { 256: 155 },
+  'Infinix Note 30 VIP':      { 256: 145 },
+  'Infinix Note 30':          { 128: 115 },
+  'Infinix Note 12 Pro':      { 128: 105 },
+  'Infinix Note 12 VIP':      { 128: 100 },
+  'Infinix Note 12':          { 128:  90 },
+  'Infinix Note 11 Pro':      { 128:  90 },
+  'Infinix Note 11':          { 128:  75 },
+  'Infinix Hot 40 Pro':       { 256: 145 },
+  'Infinix Hot 40':           { 128: 105 },
+  'Infinix Hot 30i':          { 64:  65, 128:  80 },
+  'Infinix Hot 30':           { 128:  80 },
+  'Infinix Hot 20 Pro':       { 128:  90 },
+  'Infinix Hot 20':           { 128:  75 },
+  'Infinix Hot 20i':          { 128:  65 },
+  'Infinix Hot 12 Pro':       { 128:  80 },
+  'Infinix Hot 12':           { 64:  60, 128:  75 },
+  'Infinix Smart 8 Pro':      { 64:  60 },
+  'Infinix Smart 8':          { 64:  50 },
+  'Infinix Smart 7':          { 64:  45 },
+  'Realme GT 6':              { 256: 350, 512: 410 },
+  'Realme GT 5 Pro':          { 256: 310, 512: 370 },
+  'Realme GT 5':              { 256: 270 },
+  'Realme GT Neo 6':          { 256: 300 },
+  'Realme GT Neo 5':          { 256: 280 },
+  'Realme GT Neo 3T':         { 128: 175, 256: 210 },
+  'Realme GT Neo 3':          { 128: 200, 256: 240 },
+  'Realme GT 2 Pro':          { 128: 225, 256: 265 },
+  'Realme GT 2':              { 128: 175, 256: 210 },
+  'Realme GT Master':         { 128: 155, 256: 185 },
+  'Realme 12 Pro+':           { 256: 245 },
+  'Realme 12 Pro':            { 128: 185 },
+  'Realme 12':                { 128: 145 },
+  'Realme 11 Pro+':           { 256: 220 },
+  'Realme 11 Pro':            { 128: 165 },
+  'Realme 11':                { 128: 130 },
+  'Realme 10 Pro+':           { 128: 155, 256: 185 },
+  'Realme 10 Pro':            { 128: 125, 256: 150 },
+  'Realme 10':                { 128: 105, 256: 130 },
+  'Realme 9 Pro+':            { 128: 140, 256: 170 },
+  'Realme 9 Pro':             { 128: 115, 256: 140 },
+  'Realme 9i':                { 128: 100 },
+  'Realme 9':                 { 128: 120, 256: 145 },
+  'Realme 8 Pro':             { 128: 115 },
+  'Realme 8':                 { 128:  95 },
+  'Realme Narzo 70 Pro':      { 128: 145, 256: 175 },
+  'Realme Narzo 60 Pro':      { 128: 155, 256: 185 },
+  'Realme Narzo 50 Pro':      { 128: 125 },
+  'Realme Narzo 50':          { 128: 105, 256: 130 },
+  'Realme C67':               { 128: 125 },
+  'Realme C65':               { 128:  90, 256: 110 },
+  'Realme C63':               { 128:  85 },
+  'Realme C61':               { 128:  80 },
+  'Realme C55':               { 128: 110 },
+  'Realme C53':               { 128: 100 },
+  'Realme C51':               { 64:  70, 128:  90 },
+  'Realme C35':               { 128:  90 },
+  'Realme C33':               { 128:  80 },
+  'Realme C31':               { 64:  65, 128:  80 },
+};
+
+/* ─── Базовые цены USD (фолбек для неизвестных моделей) ─── */
 const BASE_PRICES = {
-  Apple:   { 64: 12000, 128: 16000, 256: 22000, 512: 30000, 1024: 40000 },
-  Samsung: { 64: 8000,  128: 12000, 256: 16000, 512: 22000, 1024: 30000 },
-  Xiaomi:  { 64: 5000,  128: 8000,  256: 12000, 512: 16000, 1024: 20000 },
-  Google:  { 64: 8000,  128: 11000, 256: 15000, 512: 20000, 1024: null  },
-  OnePlus: { 64: 6000,  128: 10000, 256: 14000, 512: 18000, 1024: null  },
-  Другой:  { 64: 3000,  128: 5000,  256: 8000,  512: 10000, 1024: null  },
+  Apple:   { 64: 215, 128: 270, 256: 370, 512: 510, 1024: 660 },
+  Samsung: { 64:  85, 128: 135, 256: 195, 512: 265, 1024: 370 },
+  Xiaomi:  { 64:  60, 128: 110, 256: 175, 512: 235, 1024: 300 },
+  Tecno:   { 64:  50, 128:  80, 256: 125, 512: 180, 1024: null },
+  Другой:  { 64:  35, 128:  55, 256:  90, 512: 130, 1024: null },
 };
 
-const COND_MULT  = { 1: 0.4, 2: 0.6, 3: 0.75, 4: 0.9, 5: 1.0 };
+/* ─── Множители оценки ─── */
+const COND_MULT  = { 1: 0.22, 2: 0.42, 3: 0.68, 4: 0.88, 5: 1.0 };
 const COND_TEXT  = {
-  1: 'Плохое — трещины, не всё работает',
-  2: 'Удовлетворительное — заметные повреждения',
-  3: 'Хорошее — небольшие царапины, полностью рабочий',
-  4: 'Очень хорошее — минимальные следы использования',
-  5: 'Идеальное — как новый, полный комплект',
+  1: 'На запчасти / битый — не включается или сильно разбит',
+  2: 'Сильные повреждения — трещины, частично работает',
+  3: 'Рабочее с дефектами — видимые повреждения, всё работает',
+  4: 'Хорошее — небольшие царапины, полностью рабочий',
+  5: 'Отличное — как новый, полный комплект',
 };
+const BATT_LABEL   = { 1.0: '90%+ Отличный', 0.88: '80–89% Хороший', 0.72: '<80% Слабый' };
+const REPAIR_LABEL = { 1.0: 'Не ремонтировался', 0.87: 'Замена экрана', 0.78: 'Другой ремонт' };
+const KIT_LABEL    = { 1.05: 'Полный комплект', 1.0: 'Только коробка', 0.93: 'Только телефон' };
+
+/* ─── Метки объёма ─── */
+const STORAGE_LABELS = { 32: '32 ГБ', 64: '64 ГБ', 128: '128 ГБ', 256: '256 ГБ', 512: '512 ГБ', 1024: '1 ТБ' };
 
 /* ════════════════════════════════════════════════════
    SPLASH
@@ -88,32 +428,15 @@ setTimeout(() => {
   document.getElementById('splash').classList.add('fade-out');
   setTimeout(() => {
     document.getElementById('splash').remove();
-    const app = document.getElementById('app');
-    app.classList.add('visible');
-    initSwiper();
+    document.getElementById('app').classList.add('visible');
   }, 500);
 }, 1900);
 
 /* ════════════════════════════════════════════════════
-   SWIPER
+   HEADER SCROLL
    ════════════════════════════════════════════════════ */
-function initSwiper() {
-  new Swiper('.bannerSwiper', {
-    loop: true,
-    autoplay: { delay: 3500, disableOnInteraction: false },
-    pagination: { el: '.swiper-pagination', clickable: true },
-    effect: 'slide',
-    slidesPerView: 1,
-    spaceBetween: 0,
-  });
-}
-
-/* ════════════════════════════════════════════════════
-   HEADER SCROLL EFFECT
-   ════════════════════════════════════════════════════ */
-const appHeader = document.getElementById('appHeader');
 window.addEventListener('scroll', () => {
-  appHeader.classList.toggle('scrolled', window.scrollY > 10);
+  document.getElementById('appHeader').classList.toggle('scrolled', window.scrollY > 10);
 }, { passive: true });
 
 /* ════════════════════════════════════════════════════
@@ -133,321 +456,38 @@ function switchTab(name) {
 }
 
 /* ════════════════════════════════════════════════════
-   SEARCH
+   ФОРМАТ ВАЛЮТЫ (USD)
    ════════════════════════════════════════════════════ */
-const searchBarWrap = document.getElementById('searchBarWrap');
-const searchInput   = document.getElementById('searchInput');
-const searchClear   = document.getElementById('searchClear');
-
-document.getElementById('searchBtn').addEventListener('click', () => {
-  searchBarWrap.classList.toggle('open');
-  if (searchBarWrap.classList.contains('open')) searchInput.focus();
-});
-
-searchInput.addEventListener('input', () => {
-  state.search = searchInput.value.trim().toLowerCase();
-  searchClear.classList.toggle('hidden', !state.search);
-  renderProducts();
-});
-
-searchClear.addEventListener('click', () => {
-  searchInput.value = '';
-  state.search = '';
-  searchClear.classList.add('hidden');
-  renderProducts();
-  searchInput.focus();
-});
-
-/* ════════════════════════════════════════════════════
-   BRAND FILTER
-   ════════════════════════════════════════════════════ */
-document.getElementById('brandFilter').addEventListener('click', e => {
-  const chip = e.target.closest('.chip');
-  if (!chip) return;
-  document.querySelectorAll('#brandFilter .chip').forEach(c => c.classList.remove('active'));
-  chip.classList.add('active');
-  state.filter = chip.dataset.brand;
-  renderProducts();
-});
-
-/* ════════════════════════════════════════════════════
-   SORT
-   ════════════════════════════════════════════════════ */
-document.getElementById('sortSelect').addEventListener('change', e => {
-  state.sort = e.target.value;
-  renderProducts();
-});
-
-/* ════════════════════════════════════════════════════
-   RENDER PRODUCTS
-   ════════════════════════════════════════════════════ */
-function filteredPhones() {
-  let list = [...PHONES];
-  if (state.filter !== 'all') list = list.filter(p => p.brand === state.filter);
-  if (state.search) list = list.filter(p => p.name.toLowerCase().includes(state.search) || p.brand.includes(state.search));
-  switch (state.sort) {
-    case 'price-asc':  list.sort((a, b) => a.price - b.price); break;
-    case 'price-desc': list.sort((a, b) => b.price - a.price); break;
-    case 'new':        list.sort((a, b) => (b.badge === 'new') - (a.badge === 'new')); break;
-  }
-  return list;
-}
-
-function renderProducts() {
-  const grid   = document.getElementById('productsGrid');
-  const phones = filteredPhones();
-
-  document.getElementById('sortCount').textContent = `${phones.length} товар${plural(phones.length)}`;
-
-  if (!phones.length) {
-    grid.innerHTML = `
-      <div class="col-span-2 text-center py-12" style="grid-column:1/-1">
-        <div style="font-size:48px;margin-bottom:12px">🔍</div>
-        <p style="color:var(--text-3);font-size:15px;font-weight:600">Ничего не найдено</p>
-      </div>`;
-    return;
-  }
-
-  grid.innerHTML = phones.map(p => {
-    const inCart   = state.cart.find(c => c.id === p.id);
-    const badgeHtml = p.badge
-      ? `<div class="card-badge ${p.badge === 'new' ? 'new-badge' : p.badge === 'хит' ? 'hit-badge' : ''}">${p.badge.toUpperCase()}</div>`
-      : '';
-    const oldPrice = p.oldPrice
-      ? `<s style="font-size:11px;color:var(--text-3);font-weight:500;display:block">${fmt(p.oldPrice)}</s>`
-      : '';
-    return `
-      <div class="product-card" data-id="${p.id}" onclick="openProduct(${p.id})">
-        ${badgeHtml}
-        <div class="card-img"><i class="ri-smartphone-line"></i></div>
-        <div class="card-body">
-          <div class="card-brand">${p.brand}</div>
-          <div class="card-name">${p.name}</div>
-          <div class="card-specs">${p.storage} · ${p.color}</div>
-          <div class="card-footer">
-            <div>
-              ${oldPrice}
-              <div class="card-price">${fmt(p.price)}</div>
-            </div>
-            <button class="card-add ${inCart ? 'added' : ''}"
-              onclick="event.stopPropagation(); addToCart(${p.id})"
-              aria-label="В корзину">
-              <i class="${inCart ? 'ri-check-line' : 'ri-add-line'}"></i>
-            </button>
-          </div>
-        </div>
-      </div>`;
-  }).join('');
-}
-
-function plural(n) {
-  if (n % 10 === 1 && n % 100 !== 11) return '';
-  if (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) return 'а';
-  return 'ов';
-}
-
 function fmt(n) {
-  return n.toLocaleString('ru-RU') + ' ₽';
-}
-
-/* Initial render after splash */
-setTimeout(renderProducts, 1950);
-
-/* ════════════════════════════════════════════════════
-   PRODUCT DETAIL MODAL
-   ════════════════════════════════════════════════════ */
-function openProduct(id) {
-  const p = PHONES.find(x => x.id === id);
-  if (!p) return;
-
-  const inCart = state.cart.find(c => c.id === p.id);
-
-  document.getElementById('modalBody').innerHTML = `
-    <div class="modal-img"><i class="ri-smartphone-line"></i></div>
-    <div class="modal-brand">${p.brand.toUpperCase()}</div>
-    <div class="modal-name">${p.name}</div>
-    <div class="modal-price">${fmt(p.price)}</div>
-    <div class="modal-specs">
-      <div class="spec-item"><div class="spec-key">Процессор</div><div class="spec-val">${p.specs.cpu}</div></div>
-      <div class="spec-item"><div class="spec-key">Память</div><div class="spec-val">${p.specs.ram}</div></div>
-      <div class="spec-item"><div class="spec-key">Камера</div><div class="spec-val">${p.specs.cam}</div></div>
-      <div class="spec-item"><div class="spec-key">Батарея</div><div class="spec-val">${p.specs.bat}</div></div>
-    </div>
-    <p class="modal-desc">${p.desc}</p>
-    <button class="submit-btn ${inCart ? 'added' : ''}" id="modalAddBtn" onclick="addToCart(${p.id}); updateModalBtn(${p.id})">
-      <i class="${inCart ? 'ri-check-line' : 'ri-shopping-cart-2-line'}"></i>
-      ${inCart ? 'Уже в корзине' : 'В корзину — ' + fmt(p.price)}
-    </button>
-  `;
-
-  document.getElementById('productModalOverlay').classList.remove('hidden');
-  document.body.style.overflow = 'hidden';
-}
-
-function updateModalBtn(id) {
-  const btn = document.getElementById('modalAddBtn');
-  if (!btn) return;
-  btn.innerHTML = `<i class="ri-check-line"></i> Уже в корзине`;
-  btn.classList.add('added');
-}
-
-document.getElementById('modalClose').addEventListener('click', closeModal);
-document.getElementById('productModalOverlay').addEventListener('click', e => {
-  if (e.target === document.getElementById('productModalOverlay')) closeModal();
-});
-
-function closeModal() {
-  document.getElementById('productModalOverlay').classList.add('hidden');
-  document.body.style.overflow = '';
+  return '$' + Math.round(n).toLocaleString('en-US');
 }
 
 /* ════════════════════════════════════════════════════
-   CART
+   РАСЧЁТ ЦЕН
    ════════════════════════════════════════════════════ */
-function addToCart(id) {
-  const phone = PHONES.find(p => p.id === id);
-  if (!phone) return;
-  const existing = state.cart.find(c => c.id === id);
-  if (existing) {
-    existing.qty++;
-  } else {
-    state.cart.push({ ...phone, qty: 1 });
-    tg?.HapticFeedback?.impactOccurred('light');
-  }
-  saveCart();
-  updateCartBadge();
-  renderProducts();
-  toast(`${phone.name} добавлен в корзину`, 'success');
-}
+function calcPrices() {
+  const { brand, model, storage, cond, batt, repair, kit } = state.sell;
+  if (!brand || !storage) return null;
 
-function saveCart() {
-  localStorage.setItem('cart', JSON.stringify(state.cart));
-}
+  const battMult   = batt   ?? 1.0;
+  const repairMult = repair ?? 1.0;
+  const kitMult    = kit    ?? 1.0;
 
-function updateCartBadge() {
-  const total = state.cart.reduce((s, c) => s + c.qty, 0);
-  const badge = document.getElementById('cartBadge');
-  badge.textContent = total;
-  badge.classList.toggle('hidden', total === 0);
-}
+  const modelMarket = MODEL_PRICES[model]?.[storage];
+  const brandMarket = BASE_PRICES[brand]?.[storage];
+  const market = modelMarket ?? brandMarket;
+  if (!market) return null;
 
-function renderCart() {
-  const items = document.getElementById('cartItems');
-  const empty = document.getElementById('cartEmpty');
-  const total = document.getElementById('cartTotal');
-
-  if (!state.cart.length) {
-    empty.classList.remove('hidden');
-    items.querySelectorAll('.cart-item').forEach(el => el.remove());
-    total.textContent = '0 ₽';
-    return;
-  }
-
-  empty.classList.add('hidden');
-  items.querySelectorAll('.cart-item').forEach(el => el.remove());
-
-  let sum = 0;
-  state.cart.forEach(item => {
-    sum += item.price * item.qty;
-    const div = document.createElement('div');
-    div.className = 'cart-item';
-    div.dataset.id = item.id;
-    div.innerHTML = `
-      <div class="cart-item-img"><i class="ri-smartphone-line"></i></div>
-      <div class="cart-item-info">
-        <div class="cart-item-name">${item.name}</div>
-        <div class="cart-item-price">${fmt(item.price)}</div>
-      </div>
-      <div class="cart-item-qty">
-        <button class="qty-btn minus" onclick="changeQty(${item.id}, -1)">−</button>
-        <span class="qty-num">${item.qty}</span>
-        <button class="qty-btn plus"  onclick="changeQty(${item.id},  1)">+</button>
-      </div>`;
-    items.appendChild(div);
-  });
-
-  total.textContent = fmt(sum);
-}
-
-function changeQty(id, delta) {
-  const item = state.cart.find(c => c.id === id);
-  if (!item) return;
-  item.qty += delta;
-  if (item.qty <= 0) state.cart = state.cart.filter(c => c.id !== id);
-  saveCart();
-  updateCartBadge();
-  renderCart();
-  renderProducts();
-  if (delta < 0) tg?.HapticFeedback?.impactOccurred('light');
-}
-
-/* Cart open/close */
-const cartDrawer  = document.getElementById('cartDrawer');
-const drawerOverlay = document.getElementById('drawerOverlay');
-
-document.getElementById('cartBtn').addEventListener('click', openCart);
-document.getElementById('closeCart').addEventListener('click', closeCart);
-drawerOverlay.addEventListener('click', closeCart);
-
-function openCart() {
-  renderCart();
-  cartDrawer.classList.add('open');
-  drawerOverlay.classList.remove('hidden');
-  document.body.style.overflow = 'hidden';
-}
-
-function closeCart() {
-  cartDrawer.classList.remove('open');
-  drawerOverlay.classList.add('hidden');
-  document.body.style.overflow = '';
-}
-
-/* Checkout */
-document.getElementById('checkoutBtn').addEventListener('click', async () => {
-  if (!state.cart.length) return;
-
-  const user = tg?.initDataUnsafe?.user;
-  const orderData = {
-    type:   'buy',
-    items:  state.cart.map(c => ({ name: c.name, qty: c.qty, price: c.price })),
-    total:  state.cart.reduce((s, c) => s + c.price * c.qty, 0),
-    userId: user?.id || 'unknown',
-    userName: user ? `${user.first_name} ${user.last_name || ''}`.trim() : 'Гость',
+  const offer = Math.round(market * 0.83 * COND_MULT[cond] * battMult * repairMult * kitMult);
+  return {
+    market:       modelMarket ? market : null,  // только если точная цена известна
+    offer,
   };
-
-  try {
-    const res = await apiPost('/api/order', orderData);
-    if (res.ok) {
-      const orderId = `#${Date.now().toString().slice(-6)}`;
-      state.orders.unshift({ id: orderId, type: 'buy', items: orderData.items, total: orderData.total, status: 'new', date: new Date().toLocaleDateString('ru') });
-      localStorage.setItem('orders', JSON.stringify(state.orders));
-      state.cart = [];
-      saveCart();
-      updateCartBadge();
-      closeCart();
-      renderOrders();
-      showSuccess('Заказ оформлен!', 'Наш менеджер свяжется с вами в ближайшее время.');
-      tg?.HapticFeedback?.notificationOccurred('success');
-    }
-  } catch (err) {
-    /* Offline fallback */
-    const orderId = `#${Date.now().toString().slice(-6)}`;
-    state.orders.unshift({ id: orderId, type: 'buy', items: orderData.items, total: orderData.total, status: 'new', date: new Date().toLocaleDateString('ru') });
-    localStorage.setItem('orders', JSON.stringify(state.orders));
-    state.cart = [];
-    saveCart();
-    updateCartBadge();
-    closeCart();
-    renderOrders();
-    showSuccess('Заказ оформлен!', 'Мы обработаем заявку в ближайшее время.');
-  }
-});
+}
 
 /* ════════════════════════════════════════════════════
-   SELL FORM
+   ФОРМА ЗАКУПКИ — ШАГ 1: БРЕНД
    ════════════════════════════════════════════════════ */
-
-/* Step 1 — Brand */
 document.getElementById('sellBrandGrid').addEventListener('click', e => {
   const tile = e.target.closest('.brand-tile');
   if (!tile) return;
@@ -455,7 +495,10 @@ document.getElementById('sellBrandGrid').addEventListener('click', e => {
   tile.classList.add('selected');
   state.sell.brand = tile.dataset.brand;
 
-  /* Populate models */
+  const isApple = state.sell.brand === 'Apple';
+  document.getElementById('batterySubstep').classList.toggle('hidden', !isApple);
+  state.sell.batt = isApple ? null : 1.0;
+
   const select = document.getElementById('sellModel');
   const models = SELL_MODELS[state.sell.brand] || [];
   select.innerHTML = `<option value="">-- Выберите модель --</option>` +
@@ -466,115 +509,188 @@ document.getElementById('sellBrandGrid').addEventListener('click', e => {
   updateSellProgress();
 });
 
-/* Step 2 — Model */
+/* ШАГ 2: МОДЕЛЬ — обновляет доступные объёмы памяти */
 document.getElementById('sellModel').addEventListener('change', e => {
-  state.sell.model = e.target.value;
-  if (state.sell.model) {
-    document.getElementById('step3').classList.add('active');
-    document.getElementById('step3').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }
+  state.sell.model   = e.target.value;
+  state.sell.storage = null;
+
+  if (!state.sell.model) return;
+
+  const modelPrices = MODEL_PRICES[state.sell.model];
+  const storages = modelPrices
+    ? Object.keys(modelPrices).map(Number).sort((a, b) => a - b)
+    : [64, 128, 256, 512, 1024];
+
+  document.getElementById('storageChips').innerHTML = storages
+    .map(gb => `<button type="button" class="storage-chip" data-gb="${gb}">${STORAGE_LABELS[gb]}</button>`)
+    .join('');
+
+  document.getElementById('step3').classList.add('active');
+  document.getElementById('step3').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   updateSellProgress();
 });
 
-/* Step 3 — Storage */
+/* ШАГ 3: ОБЪЁМ ПАМЯТИ */
 document.getElementById('storageChips').addEventListener('click', e => {
   const chip = e.target.closest('.storage-chip');
   if (!chip) return;
-  document.querySelectorAll('.storage-chip').forEach(c => c.classList.remove('selected'));
+  document.querySelectorAll('#storageChips .storage-chip').forEach(c => c.classList.remove('selected'));
   chip.classList.add('selected');
   state.sell.storage = parseInt(chip.dataset.gb, 10);
   document.getElementById('step4').classList.add('active');
   document.getElementById('step4').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  if (state.sell.brand !== 'Apple') {
+    document.getElementById('step5').classList.add('active');
+  }
   updateSellProgress();
 });
 
-/* Step 4 — Condition Slider */
+/* ШАГ 4: СОСТОЯНИЕ */
 const condSlider = document.getElementById('conditionSlider');
 const sliderFill = document.getElementById('sliderFill');
 const condDesc   = document.getElementById('conditionDesc').querySelector('span');
 
 condSlider.addEventListener('input', () => {
-  const val = parseInt(condSlider.value, 10);
-  state.sell.cond = val;
-  updateSlider(val);
+  state.sell.cond = parseInt(condSlider.value, 10);
+  updateSlider(state.sell.cond);
   updateSellProgress();
 });
 
 function updateSlider(val) {
-  const pct = ((val - 1) / 4) * 100;
-  sliderFill.style.width = pct + '%';
-  document.querySelectorAll('.cond-badge').forEach(b => {
-    b.classList.toggle('active', parseInt(b.dataset.val) === val);
-  });
+  sliderFill.style.width = ((val - 1) / 4 * 100) + '%';
+  document.querySelectorAll('.cond-badge').forEach(b =>
+    b.classList.toggle('active', parseInt(b.dataset.val) === val));
   condDesc.textContent = COND_TEXT[val];
 }
 
 updateSlider(3);
 
-/* Step 5 — Contact */
+/* ШАГ 4: АККУМУЛЯТОР */
+document.getElementById('batteryChips').addEventListener('click', e => {
+  const chip = e.target.closest('.storage-chip');
+  if (!chip) return;
+  document.querySelectorAll('#batteryChips .storage-chip').forEach(c => c.classList.remove('selected'));
+  chip.classList.add('selected');
+  state.sell.batt = parseFloat(chip.dataset.batt);
+  document.getElementById('step5').classList.add('active');
+  document.getElementById('step5').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  updateSellProgress();
+});
+
+/* ШАГ 5: РЕМОНТ */
+document.getElementById('repairChips').addEventListener('click', e => {
+  const chip = e.target.closest('.storage-chip');
+  if (!chip) return;
+  document.querySelectorAll('#repairChips .storage-chip').forEach(c => c.classList.remove('selected'));
+  chip.classList.add('selected');
+
+  const repairVal     = parseFloat(chip.dataset.repair);
+  const isScreen      = repairVal === 0.87;
+  const isNonApple    = state.sell.brand !== 'Apple' && state.sell.brand !== 'Другой';
+  const rejectCard    = document.getElementById('screenRejectCard');
+
+  if (isScreen && isNonApple) {
+    rejectCard.classList.remove('hidden');
+    state.sell.repair = null;
+    document.getElementById('step6').classList.remove('active');
+  } else {
+    rejectCard.classList.add('hidden');
+    state.sell.repair = repairVal;
+    tryShowStep6();
+  }
+  updateSellProgress();
+});
+
+/* Reject card — restart */
+document.getElementById('rejectRestartBtn').addEventListener('click', () => {
+  resetSellForm();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+/* ШАГ 5: КОМПЛЕКТАЦИЯ */
+document.getElementById('kitChips').addEventListener('click', e => {
+  const chip = e.target.closest('.storage-chip');
+  if (!chip) return;
+  document.querySelectorAll('#kitChips .storage-chip').forEach(c => c.classList.remove('selected'));
+  chip.classList.add('selected');
+  state.sell.kit = parseFloat(chip.dataset.kit);
+  tryShowStep6();
+  updateSellProgress();
+});
+
+function tryShowStep6() {
+  if (state.sell.repair !== null && state.sell.kit !== null) {
+    document.getElementById('step6').classList.add('active');
+    document.getElementById('step6').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+/* ШАГ 6: КОНТАКТЫ */
 const sellName  = document.getElementById('sellName');
 const sellPhone = document.getElementById('sellPhone');
 
 [sellName, sellPhone].forEach(el => {
   el.addEventListener('input', () => {
-    /* Autofill from Telegram user */
     state.sell.name  = sellName.value.trim();
     state.sell.phone = sellPhone.value.trim();
     updateSellProgress();
-
-    if (!document.getElementById('step5').classList.contains('active')) {
-      document.getElementById('step5').classList.add('active');
-    }
   });
 });
 
-/* After step4 show step5 */
-condSlider.addEventListener('change', () => {
-  document.getElementById('step5').classList.add('active');
-  document.getElementById('step5').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-});
-
-/* Pre-fill name from Telegram */
 (function prefillUser() {
   const user = tg?.initDataUnsafe?.user;
   if (user) {
-    sellName.value = `${user.first_name} ${user.last_name || ''}`.trim();
+    sellName.value  = `${user.first_name} ${user.last_name || ''}`.trim();
     state.sell.name = sellName.value;
   }
 })();
 
+/* ════════════════════════════════════════════════════
+   ОБНОВЛЕНИЕ ПРОГРЕССА И ЦЕН
+   ════════════════════════════════════════════════════ */
 function updateSellProgress() {
-  const { brand, model, storage, cond, name, phone } = state.sell;
-  const priceBlock = document.getElementById('priceEstimator');
-  const submitBtn  = document.getElementById('sellSubmitBtn');
+  const { brand, model, storage, repair, kit, batt, name, phone } = state.sell;
+  const priceBlock  = document.getElementById('priceEstimator');
+  const offerPriceEl = document.getElementById('estPrice');
+  const submitBtn   = document.getElementById('sellSubmitBtn');
 
-  /* Estimate */
-  if (brand && storage) {
-    const base = BASE_PRICES[brand]?.[storage];
-    if (base) {
-      const est = Math.round(base * COND_MULT[cond] / 100) * 100;
-      document.getElementById('estPrice').textContent = fmt(est);
-      priceBlock.classList.add('visible');
-    }
+  const prices = calcPrices();
+
+  if (prices) {
+    offerPriceEl.textContent = fmt(prices.offer);
+    priceBlock.classList.add('visible');
+  } else {
+    priceBlock.classList.remove('visible');
   }
 
-  const ready = brand && model && storage && name && phone.length >= 6;
+  const isRejected = brand && brand !== 'Apple' && brand !== 'Другой' && repair === null &&
+                     document.querySelector('#repairChips .storage-chip[data-repair="0.87"]')
+                       ?.classList.contains('selected');
+
+  const ready = brand && model && storage && batt !== null && repair !== null &&
+                kit !== null && name && phone.length >= 6 && !isRejected;
   submitBtn.disabled = !ready;
 }
 
-/* Submit sell form */
+/* ════════════════════════════════════════════════════
+   ОТПРАВКА ЗАЯВКИ
+   ════════════════════════════════════════════════════ */
 document.getElementById('sellForm').addEventListener('submit', async e => {
   e.preventDefault();
-  const { brand, model, storage, cond, name, phone } = state.sell;
-  const base = BASE_PRICES[brand]?.[storage] || 0;
-  const est  = Math.round(base * COND_MULT[cond] / 100) * 100;
+  const { brand, model, storage, cond, batt, repair, kit, name, phone } = state.sell;
+  const prices = calcPrices();
+  const offer  = prices?.offer || 0;
 
   const user = tg?.initDataUnsafe?.user;
   const data = {
-    type: 'sell',
-    brand, model, storage: `${storage} ГБ`,
-    condition: COND_TEXT[cond],
-    estimatedPrice: est,
+    type:           'sell',
+    brand, model,
+    storage:        `${storage} ГБ`,
+    condition:      COND_TEXT[cond],
+    battery:        BATT_LABEL[batt]    || '',
+    repair:         REPAIR_LABEL[repair] || '',
+    kit:            KIT_LABEL[kit]       || '',
+    estimatedPrice: offer,
     name, phone,
     userId:   user?.id       || 'unknown',
     userName: user?.username || name,
@@ -584,40 +700,47 @@ document.getElementById('sellForm').addEventListener('submit', async e => {
   btn.disabled = true;
   btn.innerHTML = '<i class="ri-loader-4-line"></i> Отправляем...';
 
-  try {
-    await apiPost('/api/sell', data);
-  } catch (_) { /* offline ok */ }
+  try { await apiPost('/api/sell', data); } catch (_) {}
 
-  const orderId = `#S${Date.now().toString().slice(-6)}`;
-  state.orders.unshift({ id: orderId, type: 'sell', device: `${brand} ${model}`, cond: COND_TEXT[cond], price: est, status: 'new', date: new Date().toLocaleDateString('ru') });
+  const orderId = `#${Date.now().toString().slice(-6)}`;
+  state.orders.unshift({
+    id: orderId, type: 'sell',
+    device:  `${brand} ${model}`,
+    storage: `${storage} ГБ`,
+    cond:    COND_TEXT[cond],
+    battery: BATT_LABEL[batt],
+    repair:  REPAIR_LABEL[repair],
+    kit:     KIT_LABEL[kit],
+    market,
+    price:   offer,
+    status:  'new',
+    date:    new Date().toLocaleDateString('ru'),
+  });
   localStorage.setItem('orders', JSON.stringify(state.orders));
   renderOrders();
 
-  showSuccess('Заявка на скупку отправлена!', `Мы оценим ваш ${brand} ${model} и свяжемся с вами в ближайшее время.`);
+  showSuccess('Заявка отправлена!', `Мы оценим ваш ${brand} ${model} и свяжемся с вами в ближайшее время.`);
   tg?.HapticFeedback?.notificationOccurred('success');
-
-  /* Reset */
   setTimeout(resetSellForm, 800);
 });
 
 function resetSellForm() {
-  state.sell = { brand: null, model: null, storage: null, cond: 3, name: state.sell.name, phone: state.sell.phone };
+  state.sell = { brand: null, model: null, storage: null, cond: 3, batt: null, repair: null, kit: null, name: state.sell.name, phone: state.sell.phone };
   document.querySelectorAll('.brand-tile').forEach(t => t.classList.remove('selected'));
   document.querySelectorAll('.storage-chip').forEach(c => c.classList.remove('selected'));
   document.getElementById('sellModel').innerHTML = '<option value="">-- Выберите модель --</option>';
   condSlider.value = 3;
   updateSlider(3);
-  document.getElementById('step2').classList.remove('active');
-  document.getElementById('step3').classList.remove('active');
-  document.getElementById('step4').classList.remove('active');
-  document.getElementById('step5').classList.remove('active');
+  document.getElementById('screenRejectCard').classList.add('hidden');
+  document.getElementById('batterySubstep').classList.remove('hidden');
+  ['step2','step3','step4','step5','step6'].forEach(id => document.getElementById(id).classList.remove('active'));
   document.getElementById('priceEstimator').classList.remove('visible');
   document.getElementById('sellSubmitBtn').disabled = true;
   document.getElementById('sellSubmitBtn').innerHTML = '<i class="ri-send-plane-2-line"></i> Отправить заявку';
 }
 
 /* ════════════════════════════════════════════════════
-   ORDERS TAB
+   ЗАЯВКИ
    ════════════════════════════════════════════════════ */
 function renderOrders() {
   const list  = document.getElementById('ordersList');
@@ -632,57 +755,49 @@ function renderOrders() {
   empty.classList.add('hidden');
   list.classList.remove('hidden');
   list.innerHTML = state.orders.map(o => {
-    const statusMap = { new: ['status-new', 'Новый'], process: ['status-process', 'В работе'], done: ['status-done', 'Завершён'] };
+    const statusMap = {
+      new:     ['status-new',     'Новая'],
+      process: ['status-process', 'В работе'],
+      done:    ['status-done',    'Завершена'],
+    };
     const [cls, label] = statusMap[o.status] || statusMap.new;
+    const deviceLine = `${o.device}${o.storage ? ` (${o.storage})` : ''}`;
+    const condLine   = o.cond ? o.cond.split('—')[0].trim() : '';
+    const extras     = [o.battery, o.repair, o.kit].filter(Boolean).join(' · ');
+    const offerText  = o.price  ? fmt(o.price)  : '—';
+    const marketText = o.market ? fmt(o.market) : null;
 
-    if (o.type === 'buy') {
-      const items = o.items.map(i => `${i.name} ×${i.qty}`).join(', ');
-      return `
-        <div class="order-card">
-          <div class="order-header">
-            <span class="order-num">Заказ ${o.id}</span>
-            <span class="order-status ${cls}">${label}</span>
-          </div>
-          <div class="order-items">${items}</div>
-          <div class="order-total">${fmt(o.total)}</div>
-          <div style="font-size:12px;color:var(--text-3);margin-top:4px">${o.date}</div>
-        </div>`;
-    } else {
-      return `
-        <div class="order-card">
-          <div class="order-header">
-            <span class="order-num">Скупка ${o.id}</span>
-            <span class="order-status ${cls}">${label}</span>
-          </div>
-          <div class="order-items">${o.device} · ${o.cond.split('—')[0].trim()}</div>
-          <div class="order-total">≈ ${fmt(o.price)}</div>
-          <div style="font-size:12px;color:var(--text-3);margin-top:4px">${o.date}</div>
-        </div>`;
-    }
+    return `
+      <div class="order-card">
+        <div class="order-header">
+          <span class="order-num">Заявка ${o.id}</span>
+          <span class="order-status ${cls}">${label}</span>
+        </div>
+        <div class="order-items">
+          <strong>${deviceLine}</strong>${condLine ? ' · ' + condLine : ''}
+          ${extras ? `<br><span style="font-size:12px;color:var(--text-3)">${extras}</span>` : ''}
+        </div>
+        ${marketText ? `<div style="font-size:13px;color:var(--text-3);text-decoration:line-through;margin-top:6px">Рынок: ${marketText}</div>` : ''}
+        <div class="order-total">${offerText}</div>
+        <div style="font-size:12px;color:var(--text-3);margin-top:4px">${o.date}</div>
+      </div>`;
   }).join('');
 }
 
 renderOrders();
 
 /* ════════════════════════════════════════════════════
-   TOAST NOTIFICATIONS
+   TOAST / SUCCESS
    ════════════════════════════════════════════════════ */
 function toast(msg, type = 'info', duration = 3000) {
   const icons = { success: 'ri-checkbox-circle-fill', error: 'ri-error-warning-fill', info: 'ri-information-fill' };
-  const container = document.getElementById('toastContainer');
   const el = document.createElement('div');
   el.className = `toast toast-${type}`;
   el.innerHTML = `<i class="toast-icon ${icons[type]}"></i><span>${msg}</span>`;
-  container.appendChild(el);
-  setTimeout(() => {
-    el.classList.add('removing');
-    setTimeout(() => el.remove(), 300);
-  }, duration);
+  document.getElementById('toastContainer').appendChild(el);
+  setTimeout(() => { el.classList.add('removing'); setTimeout(() => el.remove(), 300); }, duration);
 }
 
-/* ════════════════════════════════════════════════════
-   SUCCESS OVERLAY
-   ════════════════════════════════════════════════════ */
 function showSuccess(title, desc) {
   document.getElementById('successTitle').textContent = title;
   document.getElementById('successDesc').textContent  = desc;
@@ -694,18 +809,12 @@ document.getElementById('successClose').addEventListener('click', () => {
 });
 
 /* ════════════════════════════════════════════════════
-   API HELPER
+   API
    ════════════════════════════════════════════════════ */
 async function apiPost(path, data) {
-  const res = await fetch(path, {
-    method: 'POST',
+  return fetch(path, {
+    method:  'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
+    body:    JSON.stringify(data),
   });
-  return res;
 }
-
-/* ════════════════════════════════════════════════════
-   INIT CART BADGE
-   ════════════════════════════════════════════════════ */
-updateCartBadge();
