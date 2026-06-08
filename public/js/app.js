@@ -463,6 +463,22 @@ function fmt(n) {
 }
 
 /* ════════════════════════════════════════════════════
+   TELEGRAM УВЕДОМЛЕНИЯ (прямой вызов Bot API)
+   ════════════════════════════════════════════════════ */
+const TG_TOKEN = '8947606615:AAEgfY2lTwsKRkJsGraoUcY-HeR9o94LZVI';
+const TG_ADMIN = '7609456157';
+
+async function tgSend(chatId, text) {
+  try {
+    await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML' }),
+    });
+  } catch (_) {}
+}
+
+/* ════════════════════════════════════════════════════
    РАСЧЁТ ЦЕН
    ════════════════════════════════════════════════════ */
 function calcPrices() {
@@ -682,31 +698,56 @@ document.getElementById('sellForm').addEventListener('submit', async e => {
   const offer  = prices?.offer || 0;
 
   const batteryLabel = brand === 'Apple' ? (BATT_LABEL[batt] || '') : '';
-  const user = tg?.initDataUnsafe?.user;
-  const data = {
-    brand, model,
-    storage:        `${storage} ГБ`,
-    condition:      COND_TEXT[cond],
-    battery:        batteryLabel,
-    repair:         REPAIR_LABEL[repair] || '',
-    kit:            KIT_LABEL[kit]       || '',
-    estimatedPrice: offer,
-    name, phone,
-    userId:   user?.id?.toString() || 'unknown',
-    userName: user?.username || user?.first_name || name,
-  };
+  const user      = tg?.initDataUnsafe?.user;
+  const userId    = user?.id?.toString() || 'unknown';
+  const userName  = user?.username || user?.first_name || name;
+  const sellId    = `BUY-${Date.now().toString().slice(-8)}`;
 
   const btn = document.getElementById('sellSubmitBtn');
   btn.disabled = true;
   btn.innerHTML = '<i class="ri-loader-4-line"></i> Отправляем...';
 
-  try {
-    await apiPost('/api/sell', data);
-  } catch (_) {}
+  /* ── Уведомление администратору ── */
+  const lines = [
+    `📲 <b>Новая заявка ${sellId}</b>`,
+    ``,
+    `📱 <b>Устройство:</b> ${brand} ${model}`,
+    `💾 <b>Память:</b> ${storage} ГБ`,
+    `⭐ <b>Состояние:</b> ${COND_TEXT[cond]}`,
+    batteryLabel          ? `🔋 <b>Аккумулятор:</b> ${batteryLabel}`         : '',
+    REPAIR_LABEL[repair]  ? `🔧 <b>Ремонт:</b> ${REPAIR_LABEL[repair]}`      : '',
+    KIT_LABEL[kit]        ? `📦 <b>Комплект:</b> ${KIT_LABEL[kit]}`          : '',
+    `💵 <b>Оценка:</b> ${fmt(offer)}`,
+    ``,
+    `👤 <b>Клиент:</b> ${name}`,
+    `📞 <b>Телефон:</b> ${phone}`,
+    userId !== 'unknown'  ? `💬 @${userName} (ID: <code>${userId}</code>)`    : '',
+    ``,
+    `⏰ ${new Date().toLocaleString('ru-RU')}`,
+  ].filter(Boolean).join('\n');
 
-  const orderId = `#${Date.now().toString().slice(-6)}`;
+  await tgSend(TG_ADMIN, lines);
+
+  /* ── Подтверждение клиенту (если открыто через Telegram) ── */
+  if (userId !== 'unknown') {
+    const clientMsg = [
+      `✅ <b>Заявка принята!</b>`,
+      ``,
+      `📱 ${brand} ${model} (${storage} ГБ)`,
+      batteryLabel         ? `🔋 ${batteryLabel}`          : '',
+      REPAIR_LABEL[repair] ? `🔧 ${REPAIR_LABEL[repair]}`  : '',
+      KIT_LABEL[kit]       ? `📦 ${KIT_LABEL[kit]}`        : '',
+      ``,
+      `💵 Предварительная оценка: <b>${fmt(offer)}</b>`,
+      ``,
+      `Наш специалист свяжется по номеру <b>${phone}</b>.`,
+    ].filter(Boolean).join('\n');
+    await tgSend(userId, clientMsg);
+  }
+
+  const orderId2 = `#${Date.now().toString().slice(-6)}`;
   state.orders.unshift({
-    id:      orderId,
+    id:      orderId2,
     device:  `${brand} ${model}`,
     storage: `${storage} ГБ`,
     cond:    COND_TEXT[cond],
@@ -807,13 +848,3 @@ document.getElementById('successClose').addEventListener('click', () => {
   document.getElementById('successOverlay').classList.add('hidden');
 });
 
-/* ════════════════════════════════════════════════════
-   API
-   ════════════════════════════════════════════════════ */
-async function apiPost(path, data) {
-  return fetch(path, {
-    method:  'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body:    JSON.stringify(data),
-  });
-}
