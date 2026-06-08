@@ -1,11 +1,11 @@
 {
-  "version": 2,
-  "builds": [
-    { "src": "api/sell.js",    "use": "@vercel/node" },
-    { "src": "public/**/*",    "use": "@vercel/static" }
-  ],
-  "routes": [
-    { "src": "/api/(.*)",      "dest": "/api/$1" },
-    { "src": "/(.*)",          "dest": "/public/$1" }
+  "outputDirectory": "public",
+  "functions": {
+    "api/sell.js": {
+      "runtime": "nodejs20.x"
+    }
+  },
+  "rewrites": [
+    { "source": "/((?!api/).*)", "destination": "/$1" }
   ]
 }
