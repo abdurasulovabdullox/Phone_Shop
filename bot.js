@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════
-   Malika_A22 — Telegram Bot (Закупка телефонов)
+   Malika_A22 — Telegram Bot (24/7, без веб-сервера)
    ═══════════════════════════════════════════════════════ */
 
 'use strict';
@@ -9,7 +9,8 @@ require('dotenv').config();
 const TelegramBot = require('node-telegram-bot-api');
 
 const BOT_TOKEN  = process.env.BOT_TOKEN;
-const WEBAPP_URL = process.env.WEBAPP_URL || 'https://your-domain.com';
+const ADMIN_CHAT = process.env.ADMIN_CHAT_ID;
+const WEBAPP_URL = process.env.WEBAPP_URL || '';
 
 if (!BOT_TOKEN || BOT_TOKEN === 'YOUR_TELEGRAM_BOT_TOKEN_HERE') {
   console.error('❌ Задайте BOT_TOKEN в файле .env');
@@ -17,96 +18,127 @@ if (!BOT_TOKEN || BOT_TOKEN === 'YOUR_TELEGRAM_BOT_TOKEN_HERE') {
 }
 
 const bot = new TelegramBot(BOT_TOKEN, { polling: true });
-console.log('🤖 Бот запущен и слушает сообщения...');
+console.log('🤖 Malika_A22 бот запущен...');
+
+/* ─── Helpers ─── */
+function fmt(n) {
+  return '$' + Math.round(Number(n)).toLocaleString('en-US');
+}
+
+async function send(chatId, text, opts = {}) {
+  if (!chatId) return;
+  try {
+    await bot.sendMessage(chatId, text, { parse_mode: 'HTML', ...opts });
+  } catch (err) {
+    console.error('Send error:', err.message);
+  }
+}
+
+/* Постоянная кнопка открытия Mini App (reply keyboard) */
+function mainKeyboard() {
+  return {
+    reply_markup: {
+      keyboard: [[{ text: '📲 Сдать телефон', web_app: { url: WEBAPP_URL } }]],
+      resize_keyboard: true,
+      persistent: true,
+    }
+  };
+}
 
 /* ─── /start ─── */
-bot.onText(/\/start/, async (msg) => {
-  const chatId    = msg.chat.id;
-  const firstName = msg.from?.first_name || 'друг';
-
-  await bot.sendMessage(chatId,
-    `👋 Привет, ${firstName}!\n\n` +
+bot.onText(/\/start/, async msg => {
+  const name = msg.from?.first_name || 'друг';
+  await send(msg.chat.id,
+    `👋 Привет, <b>${name}</b>!\n\n` +
     `Добро пожаловать в <b>Malika_A22</b> — сервис закупки б/у телефонов.\n\n` +
-    `📱 <b>Сдайте</b> свой телефон и получите деньги сразу\n` +
-    `💰 <b>Честная оценка</b> — Apple, Samsung, Xiaomi и другие\n` +
-    `⚡ <b>Быстро и выгодно</b> — оплата в день обращения\n\n` +
-    `Нажми кнопку ниже, чтобы оформить заявку 👇`,
-    {
-      parse_mode: 'HTML',
-      reply_markup: {
-        inline_keyboard: [[
-          {
-            text: '📲 Сдать телефон',
-            web_app: { url: WEBAPP_URL },
-          }
-        ]]
-      }
-    }
+    `📱 Сдайте телефон и получите деньги сразу\n` +
+    `💰 Честная оценка — Apple, Samsung, Xiaomi и другие\n` +
+    `⚡ Быстро и выгодно — оплата в день обращения\n\n` +
+    `Нажмите кнопку ниже 👇`,
+    mainKeyboard()
   );
 });
 
-/* ─── /sell — оформить заявку ─── */
-bot.onText(/\/sell/, async (msg) => {
-  await bot.sendMessage(msg.chat.id,
-    '📲 Хотите сдать телефон? Откройте форму заявки:',
-    {
-      parse_mode: 'HTML',
-      reply_markup: {
-        inline_keyboard: [[
-          {
-            text: '📲 Оформить заявку',
-            web_app: { url: WEBAPP_URL },
-          }
-        ]]
-      }
-    }
-  );
+/* ─── /sell ─── */
+bot.onText(/\/sell/, async msg => {
+  await send(msg.chat.id, '📲 Оформите заявку на закупку:', mainKeyboard());
 });
 
-/* ─── /brands — какие бренды принимаем ─── */
-bot.onText(/\/brands/, async (msg) => {
-  await bot.sendMessage(msg.chat.id,
-    `📦 <b>Принимаем следующие бренды:</b>\n\n` +
-    `🍎 <b>Apple</b> — iPhone 11, 12, 13, 14, 15, 16 (все серии)\n` +
-    `📱 <b>Samsung</b> — Galaxy S, A, Z Fold/Flip\n` +
+/* ─── /brands ─── */
+bot.onText(/\/brands/, async msg => {
+  await send(msg.chat.id,
+    `📦 <b>Принимаем:</b>\n\n` +
+    `🍎 <b>Apple</b> — iPhone 11–16 (все серии)\n` +
+    `📱 <b>Samsung</b> — Galaxy S, A, M, Note, Z Fold/Flip\n` +
     `🔶 <b>Xiaomi / Redmi / POCO</b> — актуальные модели\n` +
     `📲 <b>Tecno / Infinix / Realme</b> — популярные модели\n\n` +
-    `Также рассматриваем другие бренды — уточняйте у менеджера.`,
-    { parse_mode: 'HTML' }
+    `Другие бренды — уточняйте у менеджера.`
   );
 });
 
 /* ─── /help ─── */
-bot.onText(/\/help/, async (msg) => {
-  await bot.sendMessage(msg.chat.id,
-    `ℹ️ <b>Команды Malika_A22:</b>\n\n` +
+bot.onText(/\/help/, async msg => {
+  await send(msg.chat.id,
+    `ℹ️ <b>Команды:</b>\n\n` +
     `/start — главное меню\n` +
-    `/sell — оформить заявку на закупку\n` +
+    `/sell — оформить заявку\n` +
     `/brands — какие телефоны принимаем\n` +
     `/help — справка\n\n` +
-    `По всем вопросам: @manager`,
-    { parse_mode: 'HTML' }
+    `По вопросам: @manager`
   );
 });
 
-/* ─── web_app_data — данные от Mini App ─── */
-bot.on('message', async (msg) => {
+/* ─── Заявка из Mini App (web_app_data) ─── */
+bot.on('message', async msg => {
   if (!msg.web_app_data) return;
 
-  try {
-    const data = JSON.parse(msg.web_app_data.data);
-    console.log('[WebApp data]', data);
+  const userId = msg.from?.id;
+  const userName = msg.from?.username || msg.from?.first_name || 'unknown';
 
-    await bot.sendMessage(msg.chat.id,
-      `✅ Данные заявки получены!\nТип: ${data.type}`,
-      { parse_mode: 'HTML' }
-    );
-  } catch (err) {
-    console.error('WebApp data parse error:', err.message);
+  let data;
+  try {
+    data = JSON.parse(msg.web_app_data.data);
+  } catch {
+    return;
   }
+
+  const { brand, model, storage, condition, battery, repair, kit, estimatedPrice, name, phone } = data;
+  const sellId = `BUY-${Date.now().toString().slice(-8)}`;
+
+  /* Уведомление администратору */
+  const adminMsg = [
+    `📲 <b>Новая заявка ${sellId}</b>`,
+    ``,
+    `📱 <b>Устройство:</b> ${brand} ${model}`,
+    `💾 <b>Память:</b> ${storage}`,
+    `⭐ <b>Состояние:</b> ${condition}`,
+    battery ? `🔋 <b>Аккумулятор:</b> ${battery}` : '',
+    repair  ? `🔧 <b>Ремонт:</b> ${repair}`        : '',
+    kit     ? `📦 <b>Комплект:</b> ${kit}`          : '',
+    `💵 <b>Оценка:</b> ${fmt(estimatedPrice)}`,
+    ``,
+    `👤 <b>Клиент:</b> ${name}`,
+    `📞 <b>Телефон:</b> ${phone}`,
+    `💬 Telegram: @${userName} (ID: <code>${userId}</code>)`,
+    ``,
+    `⏰ ${new Date().toLocaleString('ru-RU')}`,
+  ].filter(Boolean).join('\n');
+
+  await send(ADMIN_CHAT, adminMsg);
+
+  /* Подтверждение клиенту */
+  await send(userId,
+    `✅ <b>Заявка принята!</b>\n\n` +
+    `📱 ${brand} ${model} (${storage})\n` +
+    `💵 Предварительная оценка: <b>${fmt(estimatedPrice)}</b>\n\n` +
+    `Наш специалист свяжется по номеру <b>${phone}</b>.\n` +
+    `Итоговая цена — после осмотра.`
+  );
+
+  console.log(`[BUY] ${sellId} device=${brand} ${model} user=${userId}`);
 });
 
-/* ─── Polling errors ─── */
+/* ─── Errors ─── */
 bot.on('polling_error', err => console.error('[polling]', err.message));
 
 process.on('SIGINT',  () => { bot.stopPolling(); process.exit(0); });

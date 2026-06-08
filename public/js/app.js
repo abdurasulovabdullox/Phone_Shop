@@ -681,7 +681,6 @@ document.getElementById('sellForm').addEventListener('submit', async e => {
   const prices = calcPrices();
   const offer  = prices?.offer || 0;
 
-  const user = tg?.initDataUnsafe?.user;
   const data = {
     type:           'sell',
     brand, model,
@@ -692,26 +691,22 @@ document.getElementById('sellForm').addEventListener('submit', async e => {
     kit:            KIT_LABEL[kit]       || '',
     estimatedPrice: offer,
     name, phone,
-    userId:   user?.id       || 'unknown',
-    userName: user?.username || name,
   };
 
   const btn = document.getElementById('sellSubmitBtn');
   btn.disabled = true;
   btn.innerHTML = '<i class="ri-loader-4-line"></i> Отправляем...';
 
-  try { await apiPost('/api/sell', data); } catch (_) {}
-
   const orderId = `#${Date.now().toString().slice(-6)}`;
   state.orders.unshift({
-    id: orderId, type: 'sell',
+    id:      orderId,
+    type:    'sell',
     device:  `${brand} ${model}`,
     storage: `${storage} ГБ`,
     cond:    COND_TEXT[cond],
     battery: BATT_LABEL[batt],
     repair:  REPAIR_LABEL[repair],
     kit:     KIT_LABEL[kit],
-    market,
     price:   offer,
     status:  'new',
     date:    new Date().toLocaleDateString('ru'),
@@ -719,9 +714,17 @@ document.getElementById('sellForm').addEventListener('submit', async e => {
   localStorage.setItem('orders', JSON.stringify(state.orders));
   renderOrders();
 
-  showSuccess('Заявка отправлена!', `Мы оценим ваш ${brand} ${model} и свяжемся с вами в ближайшее время.`);
   tg?.HapticFeedback?.notificationOccurred('success');
-  setTimeout(resetSellForm, 800);
+
+  /* Отправляем данные напрямую в бот и закрываем Mini App */
+  if (tg?.sendData) {
+    tg.sendData(JSON.stringify(data));
+  } else {
+    /* Фолбек — браузер без Telegram (тестирование) */
+    try { await apiPost('/api/sell', data); } catch (_) {}
+    showSuccess('Заявка отправлена!', `Мы оценим ваш ${brand} ${model} и свяжемся с вами.`);
+    setTimeout(resetSellForm, 800);
+  }
 });
 
 function resetSellForm() {
