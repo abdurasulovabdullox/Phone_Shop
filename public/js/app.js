@@ -22,6 +22,7 @@ function applyTelegramTheme() {
 /* ─── State ─── */
 const state = {
   orders: JSON.parse(localStorage.getItem('orders') || '[]'),
+  lang:   localStorage.getItem('lang') || 'ru',
   sell: {
     brand:   null,
     model:   null,
@@ -34,6 +35,172 @@ const state = {
     phone:   '',
   },
 };
+
+/* ════════════════════════════════════════════════════
+   ПЕРЕВОДЫ (RU / UZ)
+   ════════════════════════════════════════════════════ */
+const TRANSLATIONS = {
+  ru: {
+    splash_sub:        'Закупка б/у телефонов',
+    tab_sell:          'Закупка',
+    tab_orders:        'Заявки',
+    hero_title:        'Сдайте телефон',
+    hero_sub:          'Получите оценку за 30 секунд — оплата сразу',
+    step1_label:       'Выберите бренд',
+    brand_other:       'Другой',
+    step2_label:       'Модель',
+    model_placeholder: '-- Выберите модель --',
+    model_other:       'Другая модель',
+    model_comment:     'Указать в комментарии',
+    step3_label:       'Объём памяти',
+    step4_label:       'Состояние',
+    cond_label_bad:    'Битый',
+    cond_label_mid:    'С дефектами',
+    cond_label_good:   'Отличное',
+    cond1: 'На запчасти / битый — не включается или сильно разбит',
+    cond2: 'Сильные повреждения — трещины, частично работает',
+    cond3: 'Рабочее с дефектами — видимые повреждения, всё работает',
+    cond4: 'Хорошее — небольшие царапины, полностью рабочий',
+    cond5: 'Отличное — как новый, полный комплект',
+    batt_label:        'Ёмкость аккумулятора',
+    batt_90:           '90%+ Отличный',
+    batt_80:           '80–89% Хороший',
+    batt_low:          '<80% Слабый',
+    step5_label:       'Дополнительно',
+    repair_label:      'История ремонта',
+    repair_no:         'Не ремонтировался',
+    repair_screen:     'Замена экрана',
+    repair_other:      'Другой ремонт',
+    kit_label:         'Комплектация',
+    kit_full:          'Полный комплект',
+    kit_box:           'Только коробка',
+    kit_phone:         'Только телефон',
+    reject_title:      'К сожалению, не принимаем',
+    reject_desc:       'Телефоны <strong>не Apple</strong> с заменённым экраном мы не закупаем.<br>Попробуйте другое устройство.',
+    reject_restart:    'Начать заново',
+    step6_label:       'Ваши контакты',
+    contact_name:      'Имя',
+    name_placeholder:  'Как вас зовут?',
+    contact_phone:     'Телефон',
+    price_title:       'Предварительная оценка',
+    price_note:        'Средняя рыночная оценка — итоговая цена может быть выше или ниже после осмотра',
+    submit_btn:        'Отправить заявку',
+    submit_sending:    'Отправляем...',
+    orders_empty_title:'Заявок пока нет',
+    orders_empty_sub:  'Ваши заявки на закупку телефонов появятся здесь',
+    orders_create:     'Оформить заявку',
+    order_label:       'Заявка',
+    status_new:        'Новая',
+    status_process:    'В работе',
+    status_done:       'Завершена',
+    success_title:     'Заявка отправлена!',
+    success_close:     'Отлично!',
+    success_desc:      (brand, model) => `Мы оценим ваш ${brand} ${model} и свяжемся с вами.`,
+  },
+  uz: {
+    splash_sub:        'B/u telefonlarni qabul qilamiz',
+    tab_sell:          'Qabul',
+    tab_orders:        'Arizalar',
+    hero_title:        'Telefoningizni topshiring',
+    hero_sub:          '30 soniyada baho oling — to\'lov darhol',
+    step1_label:       'Brendni tanlang',
+    brand_other:       'Boshqa',
+    step2_label:       'Model',
+    model_placeholder: '-- Modelni tanlang --',
+    model_other:       'Boshqa model',
+    model_comment:     'Izohda ko\'rsatish',
+    step3_label:       'Xotira hajmi',
+    step4_label:       'Holati',
+    cond_label_bad:    'Singan',
+    cond_label_mid:    'Nuqsonli',
+    cond_label_good:   'A\'lo',
+    cond1: 'Ehtiyot qism uchun / singan — yoqmaydi yoki qattiq singan',
+    cond2: 'Kuchli shikast — yoriqlar bor, qisman ishlaydi',
+    cond3: 'Nuqsonli, ishlaydi — ko\'rinadigan shikast, ammo ishlaydi',
+    cond4: 'Yaxshi — kichik tirnalishlar, to\'liq ishlaydigan',
+    cond5: 'A\'lo — yangidek, to\'liq komplekt',
+    batt_label:        'Batareya sig\'imi',
+    batt_90:           '90%+ A\'lo',
+    batt_80:           '80–89% Yaxshi',
+    batt_low:          '<80% Zaif',
+    step5_label:       'Qo\'shimcha',
+    repair_label:      'Ta\'mirlash tarixi',
+    repair_no:         'Ta\'mirlanmagan',
+    repair_screen:     'Ekran almashtirish',
+    repair_other:      'Boshqa ta\'mir',
+    kit_label:         'Komplektatsiya',
+    kit_full:          'To\'liq komplekt',
+    kit_box:           'Faqat quti',
+    kit_phone:         'Faqat telefon',
+    reject_title:      'Afsuski, qabul qilmaymiz',
+    reject_desc:       '<strong>Apple emas</strong> telefonlar bilan almashtirilgan ekran — qabul qilmaymiz.<br>Boshqa qurilmani sinab ko\'ring.',
+    reject_restart:    'Qaytadan boshlash',
+    step6_label:       'Kontaktlaringiz',
+    contact_name:      'Ism',
+    name_placeholder:  'Ismingiz?',
+    contact_phone:     'Telefon',
+    price_title:       'Dastlabki baho',
+    price_note:        'O\'rtacha bozor bahosi — yakuniy narx ko\'rikdan keyin farq qilishi mumkin',
+    submit_btn:        'Ariza yuborish',
+    submit_sending:    'Yuborilmoqda...',
+    orders_empty_title:'Arizalar yo\'q',
+    orders_empty_sub:  'Telefonlarni qabul qilish bo\'yicha arizalaringiz shu yerda ko\'rinadi',
+    orders_create:     'Ariza berish',
+    order_label:       'Ariza',
+    status_new:        'Yangi',
+    status_process:    'Jarayonda',
+    status_done:       'Yakunlangan',
+    success_title:     'Ariza yuborildi!',
+    success_close:     'Zo\'r!',
+    success_desc:      (brand, model) => `${brand} ${model} qurilmangizni baholaymiz va siz bilan bog\'lanamiz.`,
+  },
+};
+
+function setLang(lang) {
+  state.lang = lang;
+  localStorage.setItem('lang', lang);
+  document.getElementById('langRu').classList.toggle('active', lang === 'ru');
+  document.getElementById('langUz').classList.toggle('active', lang === 'uz');
+  applyLang(lang);
+}
+
+function applyLang(lang) {
+  const t = TRANSLATIONS[lang];
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    if (key && t[key] !== undefined) el.innerHTML = t[key];
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.dataset.i18nPlaceholder;
+    if (key && t[key]) el.placeholder = t[key];
+  });
+  /* update model select placeholder if empty */
+  const sel = document.getElementById('sellModel');
+  if (sel.options[0] && sel.options[0].value === '') {
+    sel.options[0].text = t.model_placeholder;
+  }
+  /* update dynamic labels used in JS logic */
+  COND_TEXT[1] = t.cond1; COND_TEXT[2] = t.cond2; COND_TEXT[3] = t.cond3;
+  COND_TEXT[4] = t.cond4; COND_TEXT[5] = t.cond5;
+  BATT_LABEL[1.0]  = t.batt_90;
+  BATT_LABEL[0.88] = t.batt_80;
+  BATT_LABEL[0.72] = t.batt_low;
+  REPAIR_LABEL[1.0]  = t.repair_no;
+  REPAIR_LABEL[0.87] = t.repair_screen;
+  REPAIR_LABEL[0.78] = t.repair_other;
+  KIT_LABEL[1.05] = t.kit_full;
+  KIT_LABEL[1.0]  = t.kit_box;
+  KIT_LABEL[0.93] = t.kit_phone;
+  /* refresh slider description */
+  const condSpan = document.getElementById('conditionDesc')?.querySelector('span');
+  if (condSpan) condSpan.textContent = COND_TEXT[state.sell.cond ?? 3];
+  /* refresh submit button text if not in sending state */
+  const btn = document.getElementById('sellSubmitBtn');
+  const btnSpan = btn?.querySelector('[data-i18n="submit_btn"]');
+  if (btnSpan) btnSpan.textContent = t.submit_btn;
+  /* refresh orders */
+  renderOrders();
+}
 
 /* ════════════════════════════════════════════════════
    МОДЕЛИ ПО БРЕНДАМ
@@ -422,6 +589,16 @@ const KIT_LABEL    = { 1.05: 'Полный комплект', 1.0: 'Только
 const STORAGE_LABELS = { 32: '32 ГБ', 64: '64 ГБ', 128: '128 ГБ', 256: '256 ГБ', 512: '512 ГБ', 1024: '1 ТБ' };
 
 /* ════════════════════════════════════════════════════
+   INIT LANGUAGE
+   ════════════════════════════════════════════════════ */
+(function initLang() {
+  const lang = state.lang;
+  document.getElementById('langRu').classList.toggle('active', lang === 'ru');
+  document.getElementById('langUz').classList.toggle('active', lang === 'uz');
+  applyLang(lang);
+})();
+
+/* ════════════════════════════════════════════════════
    SPLASH
    ════════════════════════════════════════════════════ */
 setTimeout(() => {
@@ -515,10 +692,16 @@ document.getElementById('sellBrandGrid').addEventListener('click', e => {
   document.getElementById('batterySubstep').classList.toggle('hidden', !isApple);
   state.sell.batt = isApple ? null : 1.0;
 
+  const t = TRANSLATIONS[state.lang];
   const select = document.getElementById('sellModel');
   const models = SELL_MODELS[state.sell.brand] || [];
-  select.innerHTML = `<option value="">-- Выберите модель --</option>` +
-    models.map(m => `<option value="${m}">${m}</option>`).join('');
+  const translateModel = m => {
+    if (m === 'Другая модель') return t.model_other;
+    if (m === 'Указать в комментарии') return t.model_comment;
+    return m;
+  };
+  select.innerHTML = `<option value="">${t.model_placeholder}</option>` +
+    models.map(m => `<option value="${m}">${translateModel(m)}</option>`).join('');
 
   document.getElementById('step2').classList.add('active');
   document.getElementById('step2').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -704,8 +887,9 @@ document.getElementById('sellForm').addEventListener('submit', async e => {
   const sellId    = `BUY-${Date.now().toString().slice(-8)}`;
 
   const btn = document.getElementById('sellSubmitBtn');
+  const tl = TRANSLATIONS[state.lang];
   btn.disabled = true;
-  btn.innerHTML = '<i class="ri-loader-4-line"></i> Отправляем...';
+  btn.innerHTML = `<i class="ri-loader-4-line"></i> ${tl.submit_sending}`;
 
   /* ── Уведомление администратору ── */
   const lines = [
@@ -762,7 +946,7 @@ document.getElementById('sellForm').addEventListener('submit', async e => {
   renderOrders();
 
   tg?.HapticFeedback?.notificationOccurred('success');
-  showSuccess('Заявка отправлена!', `Мы оценим ваш ${brand} ${model} и свяжемся с вами.`);
+  showSuccess(tl.success_title, tl.success_desc(brand, model));
   setTimeout(resetSellForm, 800);
 });
 
@@ -777,8 +961,9 @@ function resetSellForm() {
   document.getElementById('batterySubstep').classList.remove('hidden');
   ['step2','step3','step4','step5','step6'].forEach(id => document.getElementById(id).classList.remove('active'));
   document.getElementById('priceEstimator').classList.remove('visible');
-  document.getElementById('sellSubmitBtn').disabled = true;
-  document.getElementById('sellSubmitBtn').innerHTML = '<i class="ri-send-plane-2-line"></i> Отправить заявку';
+  const btnEl = document.getElementById('sellSubmitBtn');
+  btnEl.disabled = true;
+  btnEl.innerHTML = `<i class="ri-send-plane-2-line"></i> <span data-i18n="submit_btn">${TRANSLATIONS[state.lang].submit_btn}</span>`;
 }
 
 /* ════════════════════════════════════════════════════
@@ -797,10 +982,11 @@ function renderOrders() {
   empty.classList.add('hidden');
   list.classList.remove('hidden');
   list.innerHTML = state.orders.map(o => {
+    const t = TRANSLATIONS[state.lang];
     const statusMap = {
-      new:     ['status-new',     'Новая'],
-      process: ['status-process', 'В работе'],
-      done:    ['status-done',    'Завершена'],
+      new:     ['status-new',     t.status_new],
+      process: ['status-process', t.status_process],
+      done:    ['status-done',    t.status_done],
     };
     const [cls, label] = statusMap[o.status] || statusMap.new;
     const deviceLine = `${o.device}${o.storage ? ` (${o.storage})` : ''}`;
@@ -811,7 +997,7 @@ function renderOrders() {
     return `
       <div class="order-card">
         <div class="order-header">
-          <span class="order-num">Заявка ${o.id}</span>
+          <span class="order-num">${t.order_label} ${o.id}</span>
           <span class="order-status ${cls}">${label}</span>
         </div>
         <div class="order-items">

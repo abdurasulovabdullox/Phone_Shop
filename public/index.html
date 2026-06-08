@@ -47,7 +47,7 @@
         <img src="./images/Logo.PNG" alt="Malika_A22" style="width:100%;height:100%;object-fit:contain;border-radius:18px;" />
       </div>
       <h1 class="splash-title">Malika_A22</h1>
-      <p class="splash-sub">Закупка б/у телефонов</p>
+      <p class="splash-sub" data-i18n="splash_sub">Закупка б/у телефонов</p>
       <div class="splash-loader">
         <div class="splash-progress"></div>
       </div>
@@ -66,6 +66,10 @@
           <img src="./images/Logo.PNG" alt="Malika_A22" style="width:34px;height:34px;object-fit:contain;border-radius:8px;background:#fff;padding:2px;" />
           <span>Malika_A22</span>
         </div>
+        <div class="lang-switch">
+          <button class="lang-btn active" id="langRu" onclick="setLang('ru')">RU</button>
+          <button class="lang-btn" id="langUz" onclick="setLang('uz')">UZ</button>
+        </div>
       </div>
       <!-- green accent line -->
       <div style="height:2px;background:linear-gradient(90deg,#00C853,#009624,transparent);"></div>
@@ -75,12 +79,12 @@
     <nav class="tab-nav" id="tabNav">
       <button class="tab-item active" data-tab="sell">
         <i class="ri-exchange-dollar-line"></i>
-        <span>Закупка</span>
+        <span data-i18n="tab_sell">Закупка</span>
         <div class="tab-indicator"></div>
       </button>
       <button class="tab-item" data-tab="orders">
         <i class="ri-file-list-3-line"></i>
-        <span>Заявки</span>
+        <span data-i18n="tab_orders">Заявки</span>
         <div class="tab-indicator"></div>
       </button>
     </nav>
@@ -91,15 +95,15 @@
     <section class="tab-content active" id="tab-sell">
       <div class="sell-hero">
         <div class="sell-hero-icon"><i class="ri-exchange-dollar-line"></i></div>
-        <h2>Сдайте телефон</h2>
-        <p>Получите оценку за 30 секунд — оплата сразу</p>
+        <h2 data-i18n="hero_title">Сдайте телефон</h2>
+        <p data-i18n="hero_sub">Получите оценку за 30 секунд — оплата сразу</p>
       </div>
 
       <form class="sell-form" id="sellForm">
 
         <!-- Step 1: Brand -->
         <div class="form-step active" id="step1">
-          <div class="step-label"><span class="step-num">1</span> Выберите бренд</div>
+          <div class="step-label"><span class="step-num">1</span> <span data-i18n="step1_label">Выберите бренд</span></div>
           <div class="brand-grid" id="sellBrandGrid">
             <div class="brand-tile" data-brand="Apple">
               <i class="ri-apple-fill"></i>
@@ -119,17 +123,17 @@
             </div>
             <div class="brand-tile" data-brand="Другой">
               <i class="ri-more-line"></i>
-              <span>Другой</span>
+              <span data-i18n="brand_other">Другой</span>
             </div>
           </div>
         </div>
 
         <!-- Step 2: Model -->
         <div class="form-step" id="step2">
-          <div class="step-label"><span class="step-num">2</span> Модель</div>
+          <div class="step-label"><span class="step-num">2</span> <span data-i18n="step2_label">Модель</span></div>
           <div class="custom-select-wrap">
             <select class="custom-select" id="sellModel">
-              <option value="">-- Выберите модель --</option>
+              <option value="" data-i18n="model_placeholder">-- Выберите модель --</option>
             </select>
             <i class="ri-arrow-down-s-line select-arrow"></i>
           </div>
@@ -137,7 +141,7 @@
 
         <!-- Step 3: Storage -->
         <div class="form-step" id="step3">
-          <div class="step-label"><span class="step-num">3</span> Объём памяти</div>
+          <div class="step-label"><span class="step-num">3</span> <span data-i18n="step3_label">Объём памяти</span></div>
           <div class="storage-chips" id="storageChips">
             <button type="button" class="storage-chip" data-gb="64">64 ГБ</button>
             <button type="button" class="storage-chip" data-gb="128">128 ГБ</button>
@@ -149,12 +153,12 @@
 
         <!-- Step 4: Condition Slider + Battery -->
         <div class="form-step" id="step4">
-          <div class="step-label"><span class="step-num">4</span> Состояние</div>
+          <div class="step-label"><span class="step-num">4</span> <span data-i18n="step4_label">Состояние</span></div>
           <div class="condition-wrap">
             <div class="condition-labels">
-              <span>Битый</span>
-              <span>С дефектами</span>
-              <span>Отличное</span>
+              <span data-i18n="cond_label_bad">Битый</span>
+              <span data-i18n="cond_label_mid">С дефектами</span>
+              <span data-i18n="cond_label_good">Отличное</span>
             </div>
             <div class="slider-track-wrap">
               <input type="range" id="conditionSlider" min="1" max="5" value="3" step="1" class="condition-slider" />
@@ -174,32 +178,32 @@
           </div>
           <!-- Battery health -->
           <div class="substep-block" id="batterySubstep">
-            <div class="step-sublabel"><i class="ri-battery-2-charge-line"></i> Ёмкость аккумулятора</div>
+            <div class="step-sublabel"><i class="ri-battery-2-charge-line"></i> <span data-i18n="batt_label">Ёмкость аккумулятора</span></div>
             <div class="storage-chips" id="batteryChips">
-              <button type="button" class="storage-chip" data-batt="1.0">90%+ Отличный</button>
-              <button type="button" class="storage-chip" data-batt="0.88">80–89% Хороший</button>
-              <button type="button" class="storage-chip" data-batt="0.72">&lt;80% Слабый</button>
+              <button type="button" class="storage-chip" data-batt="1.0" data-i18n="batt_90">90%+ Отличный</button>
+              <button type="button" class="storage-chip" data-batt="0.88" data-i18n="batt_80">80–89% Хороший</button>
+              <button type="button" class="storage-chip" data-batt="0.72" data-i18n="batt_low">&lt;80% Слабый</button>
             </div>
           </div>
         </div>
 
         <!-- Step 5: Дополнительно (ремонт + комплект) -->
         <div class="form-step" id="step5">
-          <div class="step-label"><span class="step-num">5</span> Дополнительно</div>
+          <div class="step-label"><span class="step-num">5</span> <span data-i18n="step5_label">Дополнительно</span></div>
           <div class="substep-block">
-            <div class="step-sublabel"><i class="ri-tools-line"></i> История ремонта</div>
+            <div class="step-sublabel"><i class="ri-tools-line"></i> <span data-i18n="repair_label">История ремонта</span></div>
             <div class="storage-chips" id="repairChips">
-              <button type="button" class="storage-chip" data-repair="1.0">Не ремонтировался</button>
-              <button type="button" class="storage-chip" data-repair="0.87">Замена экрана</button>
-              <button type="button" class="storage-chip" data-repair="0.78">Другой ремонт</button>
+              <button type="button" class="storage-chip" data-repair="1.0" data-i18n="repair_no">Не ремонтировался</button>
+              <button type="button" class="storage-chip" data-repair="0.87" data-i18n="repair_screen">Замена экрана</button>
+              <button type="button" class="storage-chip" data-repair="0.78" data-i18n="repair_other">Другой ремонт</button>
             </div>
           </div>
           <div class="substep-block">
-            <div class="step-sublabel"><i class="ri-box-3-line"></i> Комплектация</div>
+            <div class="step-sublabel"><i class="ri-box-3-line"></i> <span data-i18n="kit_label">Комплектация</span></div>
             <div class="storage-chips" id="kitChips">
-              <button type="button" class="storage-chip" data-kit="1.05">Полный комплект</button>
-              <button type="button" class="storage-chip" data-kit="1.0">Только коробка</button>
-              <button type="button" class="storage-chip" data-kit="0.93">Только телефон</button>
+              <button type="button" class="storage-chip" data-kit="1.05" data-i18n="kit_full">Полный комплект</button>
+              <button type="button" class="storage-chip" data-kit="1.0" data-i18n="kit_box">Только коробка</button>
+              <button type="button" class="storage-chip" data-kit="0.93" data-i18n="kit_phone">Только телефон</button>
             </div>
           </div>
         </div>
@@ -207,25 +211,25 @@
         <!-- Reject card: non-Apple with screen replacement -->
         <div class="reject-card hidden" id="screenRejectCard">
           <div class="reject-icon"><i class="ri-close-circle-fill"></i></div>
-          <h3>К сожалению, не принимаем</h3>
-          <p>Телефоны <strong>не Apple</strong> с заменённым экраном мы не закупаем.<br>Попробуйте другое устройство.</p>
+          <h3 data-i18n="reject_title">К сожалению, не принимаем</h3>
+          <p data-i18n="reject_desc">Телефоны <strong>не Apple</strong> с заменённым экраном мы не закупаем.<br>Попробуйте другое устройство.</p>
           <button type="button" class="outline-btn" id="rejectRestartBtn">
-            <i class="ri-refresh-line"></i> Начать заново
+            <i class="ri-refresh-line"></i> <span data-i18n="reject_restart">Начать заново</span>
           </button>
         </div>
 
         <!-- Step 6: Contact -->
         <div class="form-step" id="step6">
-          <div class="step-label"><span class="step-num">6</span> Ваши контакты</div>
+          <div class="step-label"><span class="step-num">6</span> <span data-i18n="step6_label">Ваши контакты</span></div>
           <div class="input-group">
-            <label>Имя</label>
+            <label data-i18n="contact_name">Имя</label>
             <div class="input-wrap">
               <i class="ri-user-line input-icon"></i>
-              <input type="text" id="sellName" placeholder="Как вас зовут?" />
+              <input type="text" id="sellName" data-i18n-placeholder="name_placeholder" placeholder="Как вас зовут?" />
             </div>
           </div>
           <div class="input-group">
-            <label>Телефон</label>
+            <label data-i18n="contact_phone">Телефон</label>
             <div class="input-wrap">
               <i class="ri-phone-line input-icon"></i>
               <input type="tel" id="sellPhone" placeholder="+998 (90) 000-00-00" />
@@ -237,15 +241,15 @@
         <div class="price-estimator" id="priceEstimator">
           <div class="price-est-header">
             <i class="ri-money-dollar-circle-line"></i>
-            <span>Предварительная оценка</span>
+            <span data-i18n="price_title">Предварительная оценка</span>
           </div>
           <div class="price-est-value" id="estPrice">$—</div>
-          <p class="price-est-note">Средняя рыночная оценка — итоговая цена может быть выше или ниже после осмотра</p>
+          <p class="price-est-note" data-i18n="price_note">Средняя рыночная оценка — итоговая цена может быть выше или ниже после осмотра</p>
         </div>
 
         <button type="submit" class="submit-btn" id="sellSubmitBtn" disabled>
           <i class="ri-send-plane-2-line"></i>
-          Отправить заявку
+          <span data-i18n="submit_btn">Отправить заявку</span>
         </button>
       </form>
     </section>
@@ -257,10 +261,10 @@
       <div class="orders-wrap">
         <div class="orders-empty" id="ordersEmpty">
           <div class="empty-icon"><i class="ri-file-list-3-line"></i></div>
-          <h3>Заявок пока нет</h3>
-          <p>Ваши заявки на закупку телефонов появятся здесь</p>
+          <h3 data-i18n="orders_empty_title">Заявок пока нет</h3>
+          <p data-i18n="orders_empty_sub">Ваши заявки на закупку телефонов появятся здесь</p>
           <button class="outline-btn" onclick="switchTab('sell')">
-            <i class="ri-exchange-dollar-line"></i> Оформить заявку
+            <i class="ri-exchange-dollar-line"></i> <span data-i18n="orders_create">Оформить заявку</span>
           </button>
         </div>
         <div class="orders-list hidden" id="ordersList"></div>
@@ -280,9 +284,9 @@
   <div class="success-overlay hidden" id="successOverlay">
     <div class="success-card">
       <div class="success-icon"><i class="ri-checkbox-circle-fill"></i></div>
-      <h3 id="successTitle">Заявка отправлена!</h3>
+      <h3 id="successTitle" data-i18n="success_title">Заявка отправлена!</h3>
       <p id="successDesc">Мы свяжемся с вами в ближайшее время</p>
-      <button class="submit-btn" id="successClose">Отлично!</button>
+      <button class="submit-btn" id="successClose" data-i18n="success_close">Отлично!</button>
     </div>
   </div>
 
