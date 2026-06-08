@@ -589,9 +589,14 @@ const KIT_LABEL    = { 1.05: 'Полный комплект', 1.0: 'Только
 const STORAGE_LABELS = { 32: '32 ГБ', 64: '64 ГБ', 128: '128 ГБ', 256: '256 ГБ', 512: '512 ГБ', 1024: '1 ТБ' };
 
 /* ════════════════════════════════════════════════════
-   INIT LANGUAGE
+   INIT LANGUAGE (reads ?lang= from URL first)
    ════════════════════════════════════════════════════ */
 (function initLang() {
+  const urlLang = new URLSearchParams(window.location.search).get('lang');
+  if (urlLang === 'ru' || urlLang === 'uz') {
+    state.lang = urlLang;
+    localStorage.setItem('lang', urlLang);
+  }
   const lang = state.lang;
   document.getElementById('langRu').classList.toggle('active', lang === 'ru');
   document.getElementById('langUz').classList.toggle('active', lang === 'uz');

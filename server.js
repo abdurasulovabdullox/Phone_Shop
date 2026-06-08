@@ -19,15 +19,8 @@ const BOT_TOKEN  = process.env.BOT_TOKEN;
 const ADMIN_CHAT = process.env.ADMIN_CHAT_ID;
 const WEBAPP_URL = process.env.WEBAPP_URL || '';
 
-/* ─── Bot init ─── */
+/* ─── Bot init (отключён — бот запускается отдельно через bot.js) ─── */
 let bot = null;
-if (BOT_TOKEN && BOT_TOKEN !== 'YOUR_TELEGRAM_BOT_TOKEN_HERE') {
-  bot = new TelegramBot(BOT_TOKEN, { polling: true });
-  console.log('✅ Telegram Bot запущен (polling)');
-  registerBotCommands(bot);
-} else {
-  console.warn('⚠️  BOT_TOKEN не задан — бот и уведомления отключены');
-}
 
 /* ─── Middleware ─── */
 app.use(cors());
@@ -55,64 +48,6 @@ function webAppBtn(label) {
 /* ════════════════════════════════════════════════════
    BOT COMMANDS
    ════════════════════════════════════════════════════ */
-function registerBotCommands(b) {
-  /* /start */
-  b.onText(/\/start/, async msg => {
-    const name = msg.from?.first_name || 'друг';
-    await send(msg.chat.id,
-      `👋 Привет, ${name}!\n\n` +
-      `Добро пожаловать в <b>Malika_A22</b> — сервис закупки б/у телефонов.\n\n` +
-      `📱 <b>Сдайте</b> свой телефон и получите деньги сразу\n` +
-      `💰 <b>Честная оценка</b> — Apple, Samsung, Xiaomi и другие\n` +
-      `⚡ <b>Быстро и выгодно</b> — оплата в день обращения\n\n` +
-      `Нажми кнопку ниже, чтобы оформить заявку 👇`,
-      webAppBtn('📲 Сдать телефон')
-    );
-  });
-
-  /* /sell */
-  b.onText(/\/sell/, async msg => {
-    await send(msg.chat.id,
-      '📲 Хотите сдать телефон? Откройте форму заявки:',
-      webAppBtn('📲 Оформить заявку')
-    );
-  });
-
-  /* /brands */
-  b.onText(/\/brands/, async msg => {
-    await send(msg.chat.id,
-      `📦 <b>Принимаем следующие бренды:</b>\n\n` +
-      `🍎 <b>Apple</b> — iPhone 11, 12, 13, 14, 15, 16 (все серии)\n` +
-      `📱 <b>Samsung</b> — Galaxy S, A, M, Note, Z Fold/Flip\n` +
-      `🔶 <b>Xiaomi / Redmi / POCO</b> — актуальные модели\n` +
-      `📲 <b>Tecno / Infinix / Realme</b> — популярные модели\n\n` +
-      `Также рассматриваем другие бренды — уточняйте у менеджера.`
-    );
-  });
-
-  /* /help */
-  b.onText(/\/help/, async msg => {
-    await send(msg.chat.id,
-      `ℹ️ <b>Команды Malika_A22:</b>\n\n` +
-      `/start — главное меню\n` +
-      `/sell — оформить заявку на закупку\n` +
-      `/brands — какие телефоны принимаем\n` +
-      `/help — справка\n\n` +
-      `По всем вопросам: @manager`
-    );
-  });
-
-  /* web_app_data */
-  b.on('message', async msg => {
-    if (!msg.web_app_data) return;
-    try {
-      const data = JSON.parse(msg.web_app_data.data);
-      await send(msg.chat.id, `✅ Заявка получена! Тип: ${data.type}`);
-    } catch {}
-  });
-
-  b.on('polling_error', err => console.error('[polling]', err.message));
-}
 
 /* ════════════════════════════════════════════════════
    API ROUTES

@@ -47,15 +47,16 @@ function mainKeyboard() {
 
 /* ─── /start ─── */
 bot.onText(/\/start/, async msg => {
-  const name = msg.from?.first_name || 'друг';
   await send(msg.chat.id,
-    `👋 Привет, <b>${name}</b>!\n\n` +
-    `Добро пожаловать в <b>Malika_A22</b> — сервис закупки б/у телефонов.\n\n` +
-    `📱 Сдайте телефон и получите деньги сразу\n` +
-    `💰 Честная оценка — Apple, Samsung, Xiaomi и другие\n` +
-    `⚡ Быстро и выгодно — оплата в день обращения\n\n` +
-    `Нажмите кнопку ниже 👇`,
-    mainKeyboard()
+    `🌐 Выберите язык / Tilni tanlang`,
+    {
+      reply_markup: {
+        inline_keyboard: [[
+          { text: '🇷🇺 Русский', web_app: { url: `${WEBAPP_URL}?lang=ru` } },
+          { text: '🇺🇿 O\'zbek',  web_app: { url: `${WEBAPP_URL}?lang=uz` } },
+        ]]
+      }
+    }
   );
 });
 
@@ -119,7 +120,7 @@ bot.on('message', async msg => {
     ``,
     `👤 <b>Клиент:</b> ${name}`,
     `📞 <b>Телефон:</b> ${phone}`,
-    `💬 Telegram: @${userName} (ID: <code>${userId}</code>)`,
+    `💬 Telegram: @${userName} )`,
     ``,
     `⏰ ${new Date().toLocaleString('ru-RU')}`,
   ].filter(Boolean).join('\n');
