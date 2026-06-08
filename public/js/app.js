@@ -682,8 +682,8 @@ document.getElementById('sellForm').addEventListener('submit', async e => {
   const offer  = prices?.offer || 0;
 
   const batteryLabel = brand === 'Apple' ? (BATT_LABEL[batt] || '') : '';
+  const user = tg?.initDataUnsafe?.user;
   const data = {
-    type:           'sell',
     brand, model,
     storage:        `${storage} ГБ`,
     condition:      COND_TEXT[cond],
@@ -692,16 +692,21 @@ document.getElementById('sellForm').addEventListener('submit', async e => {
     kit:            KIT_LABEL[kit]       || '',
     estimatedPrice: offer,
     name, phone,
+    userId:   user?.id?.toString() || 'unknown',
+    userName: user?.username || user?.first_name || name,
   };
 
   const btn = document.getElementById('sellSubmitBtn');
   btn.disabled = true;
   btn.innerHTML = '<i class="ri-loader-4-line"></i> Отправляем...';
 
+  try {
+    await apiPost('/api/sell', data);
+  } catch (_) {}
+
   const orderId = `#${Date.now().toString().slice(-6)}`;
   state.orders.unshift({
     id:      orderId,
-    type:    'sell',
     device:  `${brand} ${model}`,
     storage: `${storage} ГБ`,
     cond:    COND_TEXT[cond],
@@ -716,16 +721,8 @@ document.getElementById('sellForm').addEventListener('submit', async e => {
   renderOrders();
 
   tg?.HapticFeedback?.notificationOccurred('success');
-
-  /* Отправляем данные напрямую в бот и закрываем Mini App */
-  if (tg?.sendData) {
-    tg.sendData(JSON.stringify(data));
-  } else {
-    /* Фолбек — браузер без Telegram (тестирование) */
-    try { await apiPost('/api/sell', data); } catch (_) {}
-    showSuccess('Заявка отправлена!', `Мы оценим ваш ${brand} ${model} и свяжемся с вами.`);
-    setTimeout(resetSellForm, 800);
-  }
+  showSuccess('Заявка отправлена!', `Мы оценим ваш ${brand} ${model} и свяжемся с вами.`);
+  setTimeout(resetSellForm, 800);
 });
 
 function resetSellForm() {

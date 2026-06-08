@@ -1,5 +1,3 @@
 {
-  "outputDirectory": "public",
-  "buildCommand": "",
-  "installCommand": ""
+  "outputDirectory": "public"
 }
