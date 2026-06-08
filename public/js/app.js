@@ -681,12 +681,13 @@ document.getElementById('sellForm').addEventListener('submit', async e => {
   const prices = calcPrices();
   const offer  = prices?.offer || 0;
 
+  const batteryLabel = brand === 'Apple' ? (BATT_LABEL[batt] || '') : '';
   const data = {
     type:           'sell',
     brand, model,
     storage:        `${storage} ГБ`,
     condition:      COND_TEXT[cond],
-    battery:        BATT_LABEL[batt]    || '',
+    battery:        batteryLabel,
     repair:         REPAIR_LABEL[repair] || '',
     kit:            KIT_LABEL[kit]       || '',
     estimatedPrice: offer,
@@ -704,7 +705,7 @@ document.getElementById('sellForm').addEventListener('submit', async e => {
     device:  `${brand} ${model}`,
     storage: `${storage} ГБ`,
     cond:    COND_TEXT[cond],
-    battery: BATT_LABEL[batt],
+    battery: batteryLabel,
     repair:  REPAIR_LABEL[repair],
     kit:     KIT_LABEL[kit],
     price:   offer,
@@ -765,10 +766,9 @@ function renderOrders() {
     };
     const [cls, label] = statusMap[o.status] || statusMap.new;
     const deviceLine = `${o.device}${o.storage ? ` (${o.storage})` : ''}`;
-    const condLine   = o.cond ? o.cond.split('—')[0].trim() : '';
-    const extras     = [o.battery, o.repair, o.kit].filter(Boolean).join(' · ');
-    const offerText  = o.price  ? fmt(o.price)  : '—';
-    const marketText = o.market ? fmt(o.market) : null;
+    const condLine  = o.cond ? o.cond.split('—')[0].trim() : '';
+    const extras    = [o.battery, o.repair, o.kit].filter(Boolean).join(' · ');
+    const offerText = o.price ? fmt(o.price) : '—';
 
     return `
       <div class="order-card">
@@ -780,7 +780,6 @@ function renderOrders() {
           <strong>${deviceLine}</strong>${condLine ? ' · ' + condLine : ''}
           ${extras ? `<br><span style="font-size:12px;color:var(--text-3)">${extras}</span>` : ''}
         </div>
-        ${marketText ? `<div style="font-size:13px;color:var(--text-3);text-decoration:line-through;margin-top:6px">Рынок: ${marketText}</div>` : ''}
         <div class="order-total">${offerText}</div>
         <div style="font-size:12px;color:var(--text-3);margin-top:4px">${o.date}</div>
       </div>`;
