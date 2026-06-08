@@ -34,19 +34,16 @@ async function send(chatId, text, opts = {}) {
   }
 }
 
-/* Постоянная кнопка открытия Mini App (reply keyboard) */
-function mainKeyboard() {
-  return {
-    reply_markup: {
-      keyboard: [[{ text: '📲 Сдать телефон', web_app: { url: WEBAPP_URL } }]],
-      resize_keyboard: true,
-      persistent: true,
-    }
-  };
-}
-
 /* ─── /start ─── */
 bot.onText(/\/start/, async msg => {
+  /* Сначала убираем старую reply-клавиатуру (если осталась) */
+  try {
+    const tmp = await bot.sendMessage(msg.chat.id, '​', {
+      reply_markup: { remove_keyboard: true },
+    });
+    await bot.deleteMessage(msg.chat.id, tmp.message_id);
+  } catch (_) {}
+
   await send(msg.chat.id,
     `🌐 Выберите язык / Tilni tanlang`,
     {
@@ -62,7 +59,17 @@ bot.onText(/\/start/, async msg => {
 
 /* ─── /sell ─── */
 bot.onText(/\/sell/, async msg => {
-  await send(msg.chat.id, '📲 Оформите заявку на закупку:', mainKeyboard());
+  await send(msg.chat.id,
+    `🌐 Выберите язык / Tilni tanlang`,
+    {
+      reply_markup: {
+        inline_keyboard: [[
+          { text: '🇷🇺 Русский', web_app: { url: `${WEBAPP_URL}?lang=ru` } },
+          { text: '🇺🇿 O\'zbek',  web_app: { url: `${WEBAPP_URL}?lang=uz` } },
+        ]]
+      }
+    }
+  );
 });
 
 /* ─── /brands ─── */
