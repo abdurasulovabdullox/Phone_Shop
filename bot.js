@@ -36,7 +36,7 @@ async function send(chatId, text, opts = {}) {
 
 /* ─── /start ─── */
 bot.onText(/\/start/, async msg => {
-  /* Сначала убираем старую reply-клавиатуру (если осталась) */
+  /* Убираем старую reply-клавиатуру (если осталась) */
   try {
     const tmp = await bot.sendMessage(msg.chat.id, '​', {
       reply_markup: { remove_keyboard: true },
@@ -44,13 +44,18 @@ bot.onText(/\/start/, async msg => {
     await bot.deleteMessage(msg.chat.id, tmp.message_id);
   } catch (_) {}
 
+  const name = msg.from?.first_name || 'Друг';
+
   await send(msg.chat.id,
-    `🌐 Выберите язык / Tilni tanlang`,
+    `👋 Привет, <b>${name}</b>! / Salom, <b>${name}</b>!\n\n` +
+    `🛒 Мы покупаем б/у смартфоны по лучшим ценам в Узбекистане.\n` +
+    `<i>Biz O'zbekistonda eski smartfonlarni eng yaxshi narxlarda sotib olamiz.</i>\n\n` +
+    `📱 Нажмите кнопку ниже, чтобы оформить заявку на продажу!\n` +
+    `<i>Sotish uchun ariza bermoqchi bo'lsangiz — quyidagi tugmani bosing!</i>`,
     {
       reply_markup: {
         inline_keyboard: [[
-          { text: '🇷🇺 Русский', web_app: { url: `${WEBAPP_URL}?lang=ru` } },
-          { text: '🇺🇿 O\'zbek',  web_app: { url: `${WEBAPP_URL}?lang=uz` } },
+          { text: '🚀 Открыть приложение / Ilovani ochish', web_app: { url: WEBAPP_URL } },
         ]]
       }
     }
@@ -76,10 +81,11 @@ bot.onText(/\/sell/, async msg => {
 bot.onText(/\/brands/, async msg => {
   await send(msg.chat.id,
     `📦 <b>Принимаем:</b>\n\n` +
-    `🍎 <b>Apple</b> — iPhone 11–16 (все серии)\n` +
-    `📱 <b>Samsung</b> — Galaxy S, A, M, Note, Z Fold/Flip\n` +
-    `🔶 <b>Xiaomi / Redmi / POCO</b> — актуальные модели\n` +
-    `📲 <b>Tecno / Infinix / Realme</b> — популярные модели\n\n` +
+    `🍎 <b>Apple</b> — iPhone 8–16 (все серии, 2018–2026)\n` +
+    `📱 <b>Samsung</b> — Galaxy S, A, M, Note, Z Fold/Flip (2018–2026)\n` +
+    `🔶 <b>Xiaomi / Redmi / POCO</b> — актуальные модели (2018–2026)\n` +
+    `📲 <b>Tecno / Infinix / Realme</b> — популярные модели (2018–2026)\n` +
+    `🏅 <b>Honor</b> — Magic, X-серия, числовые серии (2018–2026)\n\n` +
     `Другие бренды — уточняйте у менеджера.`
   );
 });
