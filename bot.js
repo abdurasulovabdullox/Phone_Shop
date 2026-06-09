@@ -8,14 +8,9 @@ require('dotenv').config();
 
 const TelegramBot = require('node-telegram-bot-api');
 
-const BOT_TOKEN  = process.env.BOT_TOKEN;
-const ADMIN_CHAT = process.env.ADMIN_CHAT_ID;
-const WEBAPP_URL = process.env.WEBAPP_URL || '';
-
-if (!BOT_TOKEN || BOT_TOKEN === 'YOUR_TELEGRAM_BOT_TOKEN_HERE') {
-  console.error('❌ Задайте BOT_TOKEN в файле .env');
-  process.exit(1);
-}
+const BOT_TOKEN  = process.env.BOT_TOKEN  || '8947606615:AAEgfY2lTwsKRkJsGraoUcY-HeR9o94LZVI';
+const ADMIN_CHAT = process.env.ADMIN_CHAT_ID || '8806584055';
+const WEBAPP_URL = process.env.WEBAPP_URL || 'https://phone-shop-sooty.vercel.app';
 
 const bot = new TelegramBot(BOT_TOKEN, { polling: true });
 console.log('🤖 Malika_A22 бот запущен...');
@@ -84,7 +79,7 @@ bot.onText(/\/brands/, async msg => {
     `🍎 <b>Apple</b> — iPhone 8–16 (все серии, 2018–2026)\n` +
     `📱 <b>Samsung</b> — Galaxy S, A, M, Note, Z Fold/Flip (2018–2026)\n` +
     `🔶 <b>Xiaomi / Redmi / POCO</b> — актуальные модели (2018–2026)\n` +
-    `📲 <b>Tecno / Infinix / Realme</b> — популярные модели (2018–2026)\n` +
+    `📲 <b>Infinix</b> — популярные модели (2020–2026)\n` +
     `🏅 <b>Honor</b> — Magic, X-серия, числовые серии (2018–2026)\n\n` +
     `Другие бренды — уточняйте у менеджера.`
   );
