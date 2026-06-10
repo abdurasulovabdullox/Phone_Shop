@@ -207,7 +207,7 @@ function applyLang(lang) {
    ════════════════════════════════════════════════════ */
 const SELL_MODELS = {
   Apple: [
-    'iPhone 17 Pro Max', 'iPhone 17 Pro', 'iPhone 17 Plus', 'iPhone 17',
+    'iPhone 17 Pro Max', 'iPhone 17 Pro', 'iPhone 17 Air', 'iPhone 17',
     'iPhone 16 Pro Max', 'iPhone 16 Pro', 'iPhone 16 Plus', 'iPhone 16',
     'iPhone 15 Pro Max', 'iPhone 15 Pro', 'iPhone 15 Plus', 'iPhone 15',
     'iPhone 14 Pro Max', 'iPhone 14 Pro', 'iPhone 14 Plus', 'iPhone 14',
@@ -330,10 +330,10 @@ const SELL_MODELS = {
    ════════════════════════════════════════════════════ */
 const MODEL_PRICES = {
   /* ─── Apple ─── */
-  'iPhone 17 Pro Max':  { 256: 1000, 512: 1100              },
-  'iPhone 17 Pro':      { 128:  850, 256:  950              },
-  'iPhone 17 Plus':     { 128:  700, 256:  780              },
-  'iPhone 17':          { 128:  600, 256:  680              },
+  'iPhone 17 Pro Max':  { 256: 1000, 512: 1100, 1024: 1200, 2048: 1380 },
+  'iPhone 17 Pro':      { 256:  950, 512: 1050, 1024: 1150             },
+  'iPhone 17 Air':      { 256:  720, 512:  800, 1024:  900             },
+  'iPhone 17':          { 256:  650, 512:  730                         },
   'iPhone 16 Pro Max':  { 256: 1090, 512: 1190, 1024: 1290 },
   'iPhone 16 Pro':      { 128: 790,  256:  880, 512:   980  },
   'iPhone 16 Plus':     { 128: 740,  256:  820              },
@@ -665,7 +665,7 @@ const REPAIR_LABEL = { 1.0: 'Не ремонтировался', 0.87: 'Заме
 const KIT_LABEL    = { 1.05: 'Полный комплект', 1.0: 'Только коробка', 0.93: 'Только телефон' };
 
 /* ─── Метки объёма ─── */
-const STORAGE_LABELS = { 32: '32 ГБ', 64: '64 ГБ', 128: '128 ГБ', 256: '256 ГБ', 512: '512 ГБ', 1024: '1 ТБ' };
+const STORAGE_LABELS = { 32: '32 ГБ', 64: '64 ГБ', 128: '128 ГБ', 256: '256 ГБ', 512: '512 ГБ', 1024: '1 ТБ', 2048: '2 ТБ' };
 
 /* ════════════════════════════════════════════════════
    INIT LANGUAGE (reads ?lang= from URL first)
