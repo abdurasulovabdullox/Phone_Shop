@@ -19,9 +19,22 @@ function applyTelegramTheme() {
   if (tg.colorScheme === 'dark') document.documentElement.classList.add('dark');
 }
 
+/* ─── Safe localStorage parse ─── */
+function parseOrders(raw) {
+  try {
+    const arr = JSON.parse(raw || '[]');
+    if (!Array.isArray(arr)) return [];
+    return arr.filter(o =>
+      o && typeof o === 'object' &&
+      typeof o.id     === 'string' &&
+      typeof o.device === 'string',
+    );
+  } catch { return []; }
+}
+
 /* ─── State ─── */
 const state = {
-  orders: JSON.parse(localStorage.getItem('orders') || '[]'),
+  orders: parseOrders(localStorage.getItem('orders')),
   lang:   localStorage.getItem('lang') || 'ru',
   sell: {
     brand:   null,
@@ -724,19 +737,32 @@ function fmt(n) {
 }
 
 /* ════════════════════════════════════════════════════
-   TELEGRAM УВЕДОМЛЕНИЯ (прямой вызов Bot API)
+   HTML ESCAPING — защита от XSS
    ════════════════════════════════════════════════════ */
-const TG_TOKEN = '8947606615:AAEgfY2lTwsKRkJsGraoUcY-HeR9o94LZVI';
-const TG_ADMIN = '8806584055';
+function escHtml(str) {
+  return String(str ?? '')
+    .replace(/&/g,  '&amp;')
+    .replace(/</g,  '&lt;')
+    .replace(/>/g,  '&gt;')
+    .replace(/"/g,  '&quot;')
+    .replace(/'/g,  '&#x27;');
+}
 
-async function tgSend(chatId, text) {
-  try {
-    await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML' }),
-    });
-  } catch (_) {}
+/* ════════════════════════════════════════════════════
+   ОТПРАВКА ЗАЯВКИ — через защищённый серверный API
+   (токен бота хранится только на сервере)
+   ════════════════════════════════════════════════════ */
+async function sendOrder(payload) {
+  const resp = await fetch('/api/send-order', {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify(payload),
+  });
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({}));
+    throw new Error(err.error || `HTTP ${resp.status}`);
+  }
+  return resp.json();
 }
 
 /* ════════════════════════════════════════════════════
@@ -785,8 +811,8 @@ document.getElementById('sellBrandGrid').addEventListener('click', e => {
     if (m === 'Указать в комментарии') return t.model_comment;
     return m;
   };
-  select.innerHTML = `<option value="">${t.model_placeholder}</option>` +
-    models.map(m => `<option value="${m}">${translateModel(m)}</option>`).join('');
+  select.innerHTML = `<option value="">${escHtml(t.model_placeholder)}</option>` +
+    models.map(m => `<option value="${escHtml(m)}">${escHtml(translateModel(m))}</option>`).join('');
 
   document.getElementById('step2').classList.add('active');
   document.getElementById('step2').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -952,7 +978,8 @@ function updateSellProgress() {
                        ?.classList.contains('selected');
 
   const ready = brand && model && storage && batt !== null && repair !== null &&
-                kit !== null && name && phone.length >= 6 && !isRejected;
+                kit !== null && name?.trim().length >= 2 &&
+                phone.replace(/\D/g, '').length >= 9 && !isRejected;
   submitBtn.disabled = !ready;
 }
 
@@ -966,52 +993,37 @@ document.getElementById('sellForm').addEventListener('submit', async e => {
   const offer  = prices?.offer || 0;
 
   const batteryLabel = brand === 'Apple' ? (BATT_LABEL[batt] || '') : '';
-  const user      = tg?.initDataUnsafe?.user;
-  const userId    = user?.id?.toString() || 'unknown';
-  const userName  = user?.username || user?.first_name || name;
-  const sellId    = `BUY-${Date.now().toString().slice(-8)}`;
+  const user     = tg?.initDataUnsafe?.user;
+  const userId   = user?.id?.toString() || 'unknown';
+  const userName = user?.username || user?.first_name || name;
 
   const btn = document.getElementById('sellSubmitBtn');
-  const tl = TRANSLATIONS[state.lang];
+  const tl  = TRANSLATIONS[state.lang];
   btn.disabled = true;
   btn.innerHTML = `<i class="ri-loader-4-line"></i> ${tl.submit_sending}`;
 
-  /* ── Уведомление администратору ── */
-  const lines = [
-    `📲 <b>Новая заявка ${sellId}</b>`,
-    ``,
-    `📱 <b>Устройство:</b> ${brand} ${model}`,
-    `💾 <b>Память:</b> ${storage} ГБ`,
-    `⭐ <b>Состояние:</b> ${COND_TEXT[cond]}`,
-    batteryLabel          ? `🔋 <b>Аккумулятор:</b> ${batteryLabel}`         : '',
-    REPAIR_LABEL[repair]  ? `🔧 <b>Ремонт:</b> ${REPAIR_LABEL[repair]}`      : '',
-    KIT_LABEL[kit]        ? `📦 <b>Комплект:</b> ${KIT_LABEL[kit]}`          : '',
-    `💵 <b>Оценка:</b> ${fmt(offer)}`,
-    ``,
-    `👤 <b>Клиент:</b> ${name}`,
-    `📞 <b>Телефон:</b> ${phone}`,
-    userId !== 'unknown'  ? `💬 @${userName} (ID: <code>${userId}</code>)`    : '',
-    ``,
-    `⏰ ${new Date().toLocaleString('ru-RU')}`,
-  ].filter(Boolean).join('\n');
-
-  await tgSend(TG_ADMIN, lines);
-
-  /* ── Подтверждение клиенту (если открыто через Telegram) ── */
-  if (userId !== 'unknown') {
-    const clientMsg = [
-      `✅ <b>Заявка принята!</b>`,
-      ``,
-      `📱 ${brand} ${model} (${storage} ГБ)`,
-      batteryLabel         ? `🔋 ${batteryLabel}`          : '',
-      REPAIR_LABEL[repair] ? `🔧 ${REPAIR_LABEL[repair]}`  : '',
-      KIT_LABEL[kit]       ? `📦 ${KIT_LABEL[kit]}`        : '',
-      ``,
-      `💵 Предварительная оценка: <b>${fmt(offer)}</b>`,
-      ``,
-      `Наш специалист свяжется по номеру <b>${phone}</b>.`,
-    ].filter(Boolean).join('\n');
-    await tgSend(userId, clientMsg);
+  try {
+    await sendOrder({
+      brand,
+      model,
+      storage,
+      condition:      COND_TEXT[cond],
+      battery:        batteryLabel,
+      repair:         REPAIR_LABEL[repair] || '',
+      kit:            KIT_LABEL[kit]       || '',
+      estimatedPrice: offer,
+      name,
+      phone,
+      userId,
+      userName,
+      initData:       tg?.initData || '',
+    });
+  } catch (err) {
+    console.error('Order send error:', err);
+    btn.disabled = false;
+    btn.innerHTML = `<i class="ri-send-plane-2-line"></i> <span data-i18n="submit_btn">${tl.submit_btn}</span>`;
+    toast('Ошибка отправки. Попробуйте ещё раз.', 'error');
+    return;
   }
 
   const orderId2 = `#${Date.now().toString().slice(-6)}`;
@@ -1074,23 +1086,23 @@ function renderOrders() {
       done:    ['status-done',    t.status_done],
     };
     const [cls, label] = statusMap[o.status] || statusMap.new;
-    const deviceLine = `${o.device}${o.storage ? ` (${o.storage})` : ''}`;
-    const condLine  = o.cond ? o.cond.split('—')[0].trim() : '';
-    const extras    = [o.battery, o.repair, o.kit].filter(Boolean).join(' · ');
+    const deviceLine = `${escHtml(o.device || '')}${o.storage ? ` (${escHtml(o.storage)})` : ''}`;
+    const condLine  = o.cond ? escHtml(o.cond.split('—')[0].trim()) : '';
+    const extras    = [o.battery, o.repair, o.kit].filter(Boolean).map(escHtml).join(' · ');
     const offerText = o.price ? fmt(o.price) : '—';
 
     return `
       <div class="order-card">
         <div class="order-header">
-          <span class="order-num">${t.order_label} ${o.id}</span>
-          <span class="order-status ${cls}">${label}</span>
+          <span class="order-num">${escHtml(t.order_label)} ${escHtml(o.id || '')}</span>
+          <span class="order-status ${cls}">${escHtml(label)}</span>
         </div>
         <div class="order-items">
           <strong>${deviceLine}</strong>${condLine ? ' · ' + condLine : ''}
           ${extras ? `<br><span style="font-size:12px;color:var(--text-3)">${extras}</span>` : ''}
         </div>
         <div class="order-total">${offerText}</div>
-        <div style="font-size:12px;color:var(--text-3);margin-top:4px">${o.date}</div>
+        <div style="font-size:12px;color:var(--text-3);margin-top:4px">${escHtml(o.date || '')}</div>
       </div>`;
   }).join('');
 }
@@ -1102,9 +1114,15 @@ renderOrders();
    ════════════════════════════════════════════════════ */
 function toast(msg, type = 'info', duration = 3000) {
   const icons = { success: 'ri-checkbox-circle-fill', error: 'ri-error-warning-fill', info: 'ri-information-fill' };
-  const el = document.createElement('div');
-  el.className = `toast toast-${type}`;
-  el.innerHTML = `<i class="toast-icon ${icons[type]}"></i><span>${msg}</span>`;
+  const safeType = icons[type] ? type : 'info';
+  const el   = document.createElement('div');
+  el.className = `toast toast-${safeType}`;
+  const icon = document.createElement('i');
+  icon.className = `toast-icon ${icons[safeType]}`;
+  const span = document.createElement('span');
+  span.textContent = msg;            /* textContent — безопасно, без HTML-инъекций */
+  el.appendChild(icon);
+  el.appendChild(span);
   document.getElementById('toastContainer').appendChild(el);
   setTimeout(() => { el.classList.add('removing'); setTimeout(() => el.remove(), 300); }, duration);
 }
